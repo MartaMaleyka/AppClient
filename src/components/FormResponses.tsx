@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.js';
 import './FormResponses.css';
 
 interface Question {
@@ -32,6 +33,7 @@ interface Form {
 
 const FormResponses: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { token } = useAuth();
   const [form, setForm] = useState<Form | null>(null);
   const [responses, setResponses] = useState<Response[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,11 @@ const FormResponses: React.FC = () => {
       setForm(formData);
 
       // Fetch responses
-      const responsesResponse = await fetch(`http://localhost:5000/api/forms/${id}/responses`);
+      const responsesResponse = await fetch(`http://localhost:5000/api/forms/${id}/responses`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       if (!responsesResponse.ok) {
         throw new Error('Error al cargar respuestas');
       }

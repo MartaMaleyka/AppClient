@@ -95,7 +95,10 @@
 
 .text-input,
 .textarea-input,
-.select-input {
+.select-input,
+.date-input,
+.time-input,
+.datetime-input {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid #e9ecef;
@@ -106,7 +109,10 @@
 
 .text-input:focus,
 .textarea-input:focus,
-.select-input:focus {
+.select-input:focus,
+.date-input:focus,
+.time-input:focus,
+.datetime-input:focus {
   outline: none;
   border-color: #667eea;
 }
@@ -114,6 +120,28 @@
 .textarea-input {
   resize: vertical;
   min-height: 100px;
+}
+
+/* Estilos específicos para campos de fecha y hora */
+.date-input,
+.time-input,
+.datetime-input {
+  font-family: inherit;
+  color: #333;
+}
+
+.date-input::-webkit-calendar-picker-indicator,
+.time-input::-webkit-calendar-picker-indicator,
+.datetime-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.5);
+  transition: filter 0.2s ease;
+}
+
+.date-input::-webkit-calendar-picker-indicator:hover,
+.time-input::-webkit-calendar-picker-indicator:hover,
+.datetime-input::-webkit-calendar-picker-indicator:hover {
+  filter: invert(0.3);
 }
 
 .radio-options,

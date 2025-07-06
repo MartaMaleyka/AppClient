@@ -5,7 +5,7 @@ import './FormView.css';
 interface Question {
   id: number;
   question_text: string;
-  question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select';
+  question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'date' | 'time' | 'datetime-local';
   options: string[];
   required: boolean;
 }
@@ -208,6 +208,33 @@ const FormView: React.FC = () => {
                 </option>
               ))}
             </select>
+          )}
+
+          {question.question_type === 'date' && (
+            <input
+              type="date"
+              value={currentAnswer as string || ''}
+              onChange={(e) => handleAnswerChange(questionId, e.target.value)}
+              className="date-input"
+            />
+          )}
+
+          {question.question_type === 'time' && (
+            <input
+              type="time"
+              value={currentAnswer as string || ''}
+              onChange={(e) => handleAnswerChange(questionId, e.target.value)}
+              className="time-input"
+            />
+          )}
+
+          {question.question_type === 'datetime-local' && (
+            <input
+              type="datetime-local"
+              value={currentAnswer as string || ''}
+              onChange={(e) => handleAnswerChange(questionId, e.target.value)}
+              className="datetime-input"
+            />
           )}
         </div>
       </div>

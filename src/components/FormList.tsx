@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.js';
 import './FormList.css';
 
 interface Form {
@@ -10,6 +11,7 @@ interface Form {
 }
 
 const FormList: React.FC = () => {
+  const { token } = useAuth();
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -20,7 +22,11 @@ const FormList: React.FC = () => {
 
   const fetchForms = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/forms');
+      const response = await fetch('http://localhost:5000/api/forms', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error('Error al cargar formularios');
       }
@@ -62,19 +68,19 @@ const FormList: React.FC = () => {
   return (
     <div className="form-list-container">
       <div className="form-list-header">
-        <h1>Mis Formularios</h1>
+        <h1>Mis Formularios CSS</h1>
         <Link to="/create" className="create-form-btn">
-          + Crear Nuevo Formulario
+          + Crear Nuevo Formulario CSS
         </Link>
       </div>
 
       {forms.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">📝</div>
-          <h2>No tienes formularios aún</h2>
-          <p>Crea tu primer formulario para empezar a recopilar respuestas</p>
+          <h2>No tienes formularios CSS aún</h2>
+          <p>Crea tu primer formulario CSS para empezar a recopilar respuestas</p>
           <Link to="/create" className="create-form-btn">
-            Crear mi primer formulario
+            Crear mi primer formulario CSS
           </Link>
         </div>
       ) : (

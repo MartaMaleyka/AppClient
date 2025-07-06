@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.js';
 import './FormBuilder.css';
 
 interface Question {
   id: string;
   question_text: string;
-  question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select';
+  question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'date' | 'time' | 'datetime-local';
   options: string[];
   required: boolean;
 }
 
 const FormBuilder: React.FC = () => {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -107,6 +109,7 @@ const FormBuilder: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           title: title.trim(),
@@ -114,7 +117,7 @@ const FormBuilder: React.FC = () => {
           questions: questions.map(q => ({
             question_text: q.question_text.trim(),
             question_type: q.question_type,
-            options: q.question_type === 'text' || q.question_type === 'textarea' ? [] : q.options.filter(opt => opt.trim()),
+            options: ['text', 'textarea', 'date', 'time', 'datetime-local'].includes(q.question_type) ? [] : q.options.filter(opt => opt.trim()),
             required: q.required
           }))
         }),
@@ -136,8 +139,8 @@ const FormBuilder: React.FC = () => {
   return (
     <div className="form-builder-container">
       <div className="form-builder-header">
-        <h1>Crear Nuevo Formulario</h1>
-        <p>Diseña tu formulario personalizado</p>
+        <h1>Crear Nuevo Formulario CSS</h1>
+        <p>Diseña tu formulario personalizado con estilos modernos</p>
       </div>
 
       <form onSubmit={handleSubmit} className="form-builder-form">
@@ -223,6 +226,9 @@ const FormBuilder: React.FC = () => {
                           <option value="radio">Opción única</option>
                           <option value="checkbox">Múltiples opciones</option>
                           <option value="select">Lista desplegable</option>
+                          <option value="date">Fecha</option>
+                          <option value="time">Hora</option>
+                          <option value="datetime-local">Fecha y Hora</option>
                         </select>
                       </div>
 
