@@ -139,6 +139,18 @@
   transform: translateY(-1px);
 }
 
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
 .loading, .error {
   text-align: center;
   padding: 2rem;

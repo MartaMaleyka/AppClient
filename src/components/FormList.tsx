@@ -39,6 +39,43 @@ const FormList: React.FC = () => {
     }
   };
 
+  const deleteForm = async (formId: number) => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este formulario? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      console.log('Attempting to delete form:', formId);
+      console.log('Token:', token);
+      
+      const response = await fetch(`http://localhost:5000/api/forms/${formId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error response:', errorData);
+        throw new Error(`Error al eliminar formulario: ${response.status} - ${errorData}`);
+      }
+      
+      const result = await response.json();
+      console.log('Delete successful:', result);
+      
+      // Remove the form from the local state
+      setForms(forms.filter(form => form.id !== formId));
+    } catch (err) {
+      console.error('Delete error:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -107,6 +144,12 @@ const FormList: React.FC = () => {
                 >
                   📊 Ver Respuestas
                 </Link>
+                <button 
+                  onClick={() => deleteForm(form.id)}
+                  className="form-action-btn delete-btn"
+                >
+                  🗑️ Eliminar
+                </button>
               </div>
             </div>
           ))}

@@ -81,13 +81,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>{isLogin ? 'Welcome to Forms CSS' : 'Create Account'}</h1>
-          <p>{isLogin ? 'Sign in to your account' : 'Join Forms CSS today'}</p>
+          <h1>{isLogin ? 'Bienvenido a Forms CSS' : 'Crear cuenta'}</h1>
+          <p>{isLogin ? 'Inicia sesión en tu cuenta' : 'Únete a Forms CSS hoy'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">Nombre de usuario</label>
             <input
               type="text"
               id="username"
@@ -101,7 +101,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           {!isLogin && (
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">Correo electrónico</label>
               <input
                 type="email"
                 id="email"
@@ -115,7 +115,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           )}
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               type="password"
               id="password"
@@ -129,7 +129,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           {!isLogin && (
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="confirmPassword">Confirmar contraseña</label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -145,15 +145,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           {error && <div className="error-message">{error}</div>}
 
           <button type="submit" className="login-button" disabled={loading}>
-            {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Create Account')}
+            {loading ? 'Cargando...' : (isLogin ? 'Iniciar sesión' : 'Crear cuenta')}
           </button>
         </form>
 
         <div className="login-footer">
           <p>
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            {isLogin ? "¿No tienes una cuenta? " : "¿Ya tienes una cuenta? "}
             <button type="button" onClick={toggleMode} className="toggle-button">
-              {isLogin ? 'Sign Up' : 'Sign In'}
+              {isLogin ? 'Registrarse' : 'Iniciar sesión'}
             </button>
           </p>
         </div>
