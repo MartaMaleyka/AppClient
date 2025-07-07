@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.js';
 import './FormResponses.css';
+import * as XLSX from 'xlsx';
 
 interface Question {
   id: number;
@@ -86,6 +87,28 @@ const FormResponses: React.FC = () => {
     return answer ? answer.answer_text : 'Sin respuesta';
   };
 
+  // Exportar a Excel
+  const exportToExcel = () => {
+    if (!form || responses.length === 0) return;
+    // Encabezados: Respondente, Fecha, P1..., P2...
+    const headers = [
+      'Respondente',
+      'Fecha',
+      ...form.questions.map((q, idx) => `P${idx + 1}. ${q.question_text}`)
+    ];
+    // Filas de datos
+    const data = responses.map((response) => [
+      response.respondent_name || 'Anónimo',
+      formatDate(response.submitted_at),
+      ...form.questions.map((question) => getAnswerForQuestion(response, question.id))
+    ]);
+    // Unir encabezados y datos
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Respuestas');
+    XLSX.writeFile(workbook, `Respuestas_${form.title.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`);
+  };
+
   if (loading) {
     return (
       <div className="responses-container">
@@ -146,6 +169,7 @@ const FormResponses: React.FC = () => {
         </div>
       ) : (
         <div className="responses-content">
+          <button className="export-btn" onClick={exportToExcel} style={{marginBottom: '16px'}}>Exportar a Excel</button>
           <div className="responses-table">
             <div className="table-header">
               <div className="header-cell respondent">Respondente</div>

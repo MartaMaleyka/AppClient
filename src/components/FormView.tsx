@@ -8,6 +8,13 @@ interface Question {
   question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'date' | 'time' | 'datetime-local';
   options: string[];
   required: boolean;
+  skip_logic?: {
+    enabled: boolean;
+    conditions: {
+      option: string;
+      skip_to_question: number;
+    }[];
+  };
 }
 
 interface Form {
@@ -31,10 +38,98 @@ const FormView: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [respondentName, setRespondentName] = useState('');
   const [answers, setAnswers] = useState<{ [key: number]: string | string[] }>({});
+  const [visibleQuestions, setVisibleQuestions] = useState<number[]>([]);
 
   useEffect(() => {
     fetchForm();
   }, [id]);
+
+  useEffect(() => {
+    if (form) {
+      calculateVisibleQuestions();
+    }
+  }, [form, answers]);
+
+  const calculateVisibleQuestions = () => {
+    if (!form) return;
+
+    console.log('=== INICIO CÁLCULO DE PREGUNTAS VISIBLES ===');
+    console.log('Respuestas actuales:', answers);
+
+    // Inicialmente, todas las preguntas son visibles
+    let visible = form.questions.map(q => q.id);
+    console.log('Preguntas inicialmente visibles:', visible);
+
+    // Aplicar lógica de saltos de manera secuencial
+    for (let i = 0; i < form.questions.length; i++) {
+      const question = form.questions[i];
+      const questionId = question.id;
+      
+      console.log(`\n--- Evaluando pregunta ${i + 1}: ${question.question_text} ---`);
+      console.log('Skip logic:', question.skip_logic);
+      console.log('Respuesta actual:', answers[questionId]);
+      
+      // Solo evaluar si la pregunta actual es visible y tiene skip_logic habilitado
+      if (visible.includes(questionId) && question.skip_logic?.enabled && answers[questionId]) {
+        const answer = answers[questionId];
+        console.log('Respuesta para saltos:', answer);
+        
+        // Buscar condición que coincida
+        const skipCondition = question.skip_logic.conditions.find(condition => {
+          const matches = Array.isArray(answer) 
+            ? answer.includes(condition.option)
+            : answer === condition.option;
+          console.log(`Comparando "${answer}" con "${condition.option}": ${matches}`);
+          return matches;
+        });
+
+        if (skipCondition) {
+          console.log('✅ Condición de salto encontrada:', skipCondition);
+          
+          if (skipCondition.skip_to_question === 0) {
+            // Ocultar todas las preguntas después de esta
+            const beforeFilter = [...visible];
+            visible = visible.filter(id => {
+              const qIndex = form.questions.findIndex(q => q.id === id);
+              return qIndex <= i;
+            });
+            console.log('Ocultando todas las preguntas después de la actual');
+            console.log('Antes del filtro:', beforeFilter);
+            console.log('Después del filtro:', visible);
+          } else {
+            // Ocultar preguntas entre la actual y la de destino
+            const targetIndex = skipCondition.skip_to_question - 1;
+            console.log(`🎯 Saltando de pregunta ${i + 1} a pregunta ${targetIndex + 1}`);
+            
+            if (targetIndex >= 0 && targetIndex < form.questions.length) {
+              const beforeFilter = [...visible];
+              // Ocultar las preguntas que están entre la actual y la de destino
+              visible = visible.filter(id => {
+                const qIndex = form.questions.findIndex(q => q.id === id);
+                // Mantener la pregunta actual y la de destino, ocultar las del medio
+                const shouldKeep = qIndex <= i || qIndex >= targetIndex;
+                console.log(`Pregunta ${qIndex + 1} (ID: ${id}): ${shouldKeep ? 'MANTENER' : 'OCULTAR'}`);
+                return shouldKeep;
+              });
+              console.log('Antes del filtro:', beforeFilter);
+              console.log('Después del filtro:', visible);
+            } else {
+              console.log('❌ Índice de destino inválido:', targetIndex);
+            }
+          }
+        } else {
+          console.log('❌ No se encontró condición de salto');
+        }
+      } else {
+        console.log('❌ No hay skip_logic habilitado, no hay respuesta, o la pregunta no es visible');
+      }
+    }
+
+    console.log('\n=== RESULTADO FINAL ===');
+    console.log('Preguntas visibles finales:', visible);
+    console.log('=== FIN CÁLCULO ===\n');
+    setVisibleQuestions(visible);
+  };
 
   const fetchForm = async () => {
     try {
@@ -52,10 +147,20 @@ const FormView: React.FC = () => {
   };
 
   const handleAnswerChange = (questionId: number, value: string | string[]) => {
+    console.log(`Cambiando respuesta para pregunta ${questionId}:`, value);
+    
     setAnswers(prev => ({
       ...prev,
       [questionId]: value
     }));
+    
+    // Recalcular preguntas visibles inmediatamente después de cambiar una respuesta
+    setTimeout(() => {
+      if (form) {
+        console.log('Recalculando después de cambio de respuesta...');
+        calculateVisibleQuestions();
+      }
+    }, 100);
   };
 
   const handleCheckboxChange = (questionId: number, option: string, checked: boolean) => {
@@ -75,7 +180,7 @@ const FormView: React.FC = () => {
     }
 
     for (const question of form!.questions) {
-      if (question.required) {
+      if (question.required && visibleQuestions.includes(question.id)) {
         const answer = answers[question.id];
         if (!answer || 
             (typeof answer === 'string' && !answer.trim()) ||
@@ -100,10 +205,12 @@ const FormView: React.FC = () => {
     setError('');
 
     try {
-      const answersArray: Answer[] = Object.entries(answers).map(([questionId, answer]) => ({
-        question_id: parseInt(questionId),
-        answer_text: Array.isArray(answer) ? answer.join(', ') : answer
-      }));
+      const answersArray: Answer[] = Object.entries(answers)
+        .filter(([questionId]) => visibleQuestions.includes(parseInt(questionId)))
+        .map(([questionId, answer]) => ({
+          question_id: parseInt(questionId),
+          answer_text: Array.isArray(answer) ? answer.join(', ') : answer
+        }));
 
       const response = await fetch(`http://localhost:5000/api/forms/${id}/responses`, {
         method: 'POST',
@@ -128,16 +235,23 @@ const FormView: React.FC = () => {
     }
   };
 
-  const renderQuestion = (question: Question, index: number) => {
+  const renderQuestion = (question: Question, index: number, originalIndex: number) => {
     const questionId = question.id;
     const currentAnswer = answers[questionId];
+    const isVisible = visibleQuestions.includes(questionId);
 
     return (
-      <div key={questionId} className="question-container">
+      <div 
+        key={questionId} 
+        className={`question-container ${isVisible ? 'question-visible' : 'question-hidden'}`}
+      >
         <div className="question-header">
           <h3>
-            {index + 1}. {question.question_text}
+            {isVisible ? `${index}. ` : ''}{question.question_text}
             {question.required && <span className="required"> *</span>}
+            {!isVisible && (
+              <span className="skip-indicator"> (Oculta)</span>
+            )}
           </h3>
         </div>
 
@@ -309,9 +423,17 @@ const FormView: React.FC = () => {
 
         <div className="questions-section">
           <h2>Preguntas</h2>
-          {form.questions.map((question, index) => 
-            renderQuestion(question, index)
+          {visibleQuestions.length < form.questions.length && (
+            <div className="questions-indicator">
+              <span className="visible-count">Preguntas visibles: {visibleQuestions.length}</span>
+              <span className="hidden-count">Ocultas: {form.questions.length - visibleQuestions.length}</span>
+            </div>
           )}
+          {form.questions.map((question, index) => {
+            const visibleIndex = visibleQuestions.indexOf(question.id);
+            const questionNumber = visibleIndex >= 0 ? visibleIndex + 1 : null;
+            return renderQuestion(question, questionNumber || index + 1, index);
+          })}
         </div>
 
         {error && (
@@ -334,4 +456,4 @@ const FormView: React.FC = () => {
   );
 };
 
-export default FormView; 
+export default FormView;

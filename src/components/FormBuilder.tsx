@@ -9,6 +9,13 @@ interface Question {
   question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'date' | 'time' | 'datetime-local';
   options: string[];
   required: boolean;
+  skip_logic?: {
+    enabled: boolean;
+    conditions: {
+      option: string;
+      skip_to_question: number;
+    }[];
+  };
 }
 
 const FormBuilder: React.FC = () => {
@@ -26,7 +33,11 @@ const FormBuilder: React.FC = () => {
       question_text: '',
       question_type: 'text',
       options: [''],
-      required: false
+      required: false,
+      skip_logic: {
+        enabled: false,
+        conditions: []
+      }
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -68,6 +79,66 @@ const FormBuilder: React.FC = () => {
         ? { 
             ...q, 
             options: q.options.filter((_, idx) => idx !== optionIndex)
+          }
+        : q
+    ));
+  };
+
+  const toggleSkipLogic = (questionId: string) => {
+    setQuestions(questions.map(q => 
+      q.id === questionId 
+        ? { 
+            ...q, 
+            skip_logic: {
+              enabled: !q.skip_logic?.enabled,
+              conditions: q.skip_logic?.conditions || []
+            }
+          }
+        : q
+    ));
+  };
+
+  const addSkipCondition = (questionId: string) => {
+    setQuestions(questions.map(q => 
+      q.id === questionId 
+        ? { 
+            ...q, 
+            skip_logic: {
+              ...q.skip_logic!,
+              conditions: [...(q.skip_logic?.conditions || []), { option: '', skip_to_question: 0 }]
+            }
+          }
+        : q
+    ));
+  };
+
+  const updateSkipCondition = (questionId: string, conditionIndex: number, field: 'option' | 'skip_to_question', value: string | number) => {
+    setQuestions(questions.map(q => 
+      q.id === questionId 
+        ? { 
+            ...q, 
+            skip_logic: {
+              ...q.skip_logic!,
+              conditions: q.skip_logic?.conditions.map((cond, idx) => 
+                idx === conditionIndex 
+                  ? { ...cond, [field]: value }
+                  : cond
+              ) || []
+            }
+          }
+        : q
+    ));
+  };
+
+  const removeSkipCondition = (questionId: string, conditionIndex: number) => {
+    setQuestions(questions.map(q => 
+      q.id === questionId 
+        ? { 
+            ...q, 
+            skip_logic: {
+              ...q.skip_logic!,
+              conditions: q.skip_logic?.conditions.filter((_, idx) => idx !== conditionIndex) || []
+            }
           }
         : q
     ));
@@ -118,7 +189,8 @@ const FormBuilder: React.FC = () => {
             question_text: q.question_text.trim(),
             question_type: q.question_type,
             options: ['text', 'textarea', 'date', 'time', 'datetime-local'].includes(q.question_type) ? [] : q.options.filter(opt => opt.trim()),
-            required: q.required
+            required: q.required,
+            skip_logic: q.skip_logic
           }))
         }),
       });
@@ -276,6 +348,86 @@ const FormBuilder: React.FC = () => {
                         </button>
                       </div>
                     )}
+
+                    {/* Lógica de Saltos */}
+                    <div className="skip-logic-section">
+                      <div className="skip-logic-header">
+                        <label className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={question.skip_logic?.enabled || false}
+                            onChange={() => toggleSkipLogic(question.id)}
+                          />
+                          <span className="skip-logic-label">Mostrar/ocultar preguntas según respuesta</span>
+                        </label>
+                      </div>
+
+                      {question.skip_logic?.enabled && (
+                        <div className="skip-conditions">
+                          <div className="skip-logic-info">
+                            <p>Configura qué preguntas mostrar u ocultar según la respuesta del usuario:</p>
+                          </div>
+                          
+                          {question.skip_logic.conditions.map((condition, conditionIndex) => (
+                            <div key={conditionIndex} className="skip-condition">
+                              <div className="condition-header">
+                                <span className="condition-label">Condición {conditionIndex + 1}:</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeSkipCondition(question.id, conditionIndex)}
+                                  className="remove-condition-btn"
+                                  title="Eliminar condición"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              
+                              <div className="condition-content">
+                                <div className="condition-part">
+                                  <label>Si el usuario selecciona:</label>
+                                  <select
+                                    value={condition.option}
+                                    onChange={(e) => updateSkipCondition(question.id, conditionIndex, 'option', e.target.value)}
+                                    className="condition-select"
+                                  >
+                                    <option value="">Seleccionar opción</option>
+                                    {question.options.map((option, idx) => (
+                                      <option key={idx} value={option}>{option}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                                
+                                <div className="condition-part">
+                                  <label>Entonces:</label>
+                                  <select
+                                    value={condition.skip_to_question}
+                                    onChange={(e) => updateSkipCondition(question.id, conditionIndex, 'skip_to_question', parseInt(e.target.value))}
+                                    className="condition-select"
+                                  >
+                                    <option value={0}>Finalizar formulario</option>
+                                    {questions.map((q, idx) => (
+                                      <option key={q.id} value={idx + 1}>Ir a Pregunta {idx + 1}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          <button
+                            type="button"
+                            onClick={() => addSkipCondition(question.id)}
+                            className="add-condition-btn"
+                          >
+                            + Agregar otra condición
+                          </button>
+                          
+                          <div className="skip-logic-help">
+                            <p><strong>Nota:</strong> Las preguntas se ocultarán automáticamente cuando se cumplan las condiciones configuradas.</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

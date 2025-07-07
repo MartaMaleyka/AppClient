@@ -73,6 +73,7 @@
   border: 2px solid #e9ecef;
   border-radius: 8px;
   background: #f8f9fa;
+  transition: all 0.3s ease-in-out;
 }
 
 .question-header h3 {
@@ -290,4 +291,97 @@
   .form-header h1 {
     font-size: 1.5rem;
   }
+}
+
+.skip-indicator {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-style: italic;
+  margin-left: 0.5rem;
+  background: rgba(108, 117, 125, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.question-visible {
+  opacity: 1;
+  max-height: 1000px;
+  margin-bottom: 1rem;
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.question-hidden {
+  opacity: 0.4;
+  max-height: 200px;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-5px);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px dashed #dee2e6;
+  position: relative;
+}
+
+.question-container.question-hidden::before {
+  content: "⏭️ Pregunta oculta por lógica condicional";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #6c757d;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+}
+
+.question-container.question-hidden .question-content {
+  filter: grayscale(0.5);
+  opacity: 0.6;
+}
+
+.question-container.question-hidden .question-header h3 {
+  color: #6c757d;
+  font-style: italic;
+  text-decoration: line-through;
+}
+
+/* Animación para preguntas que aparecen */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.question-visible {
+  animation: fadeInSlide 0.3s ease-out;
+}
+
+.questions-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: #e3f2fd;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border: 1px solid #bbdefb;
+}
+
+.visible-count {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.hidden-count {
+  color: #6c757d;
+  font-size: 0.9rem;
 } 
