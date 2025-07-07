@@ -47,81 +47,56 @@ const FormView: React.FC = () => {
   const calculateVisibleQuestions = useCallback(() => {
     if (!form) return;
 
-    console.log('=== INICIO CÁLCULO DE PREGUNTAS VISIBLES ===');
-    console.log('Respuestas actuales:', answers);
-
     // Inicialmente, todas las preguntas son visibles
     let visible = form.questions.map(q => q.id);
-    console.log('Preguntas inicialmente visibles:', visible);
 
-    // Aplicar lógica de saltos de manera secuencial
     for (let i = 0; i < form.questions.length; i++) {
       const question = form.questions[i];
       const questionId = question.id;
-      
-      console.log(`\n--- Evaluando pregunta ${i + 1}: ${question.question_text} ---`);
-      console.log('Skip logic:', question.skip_logic);
-      console.log('Respuesta actual:', answers[questionId]);
-      
-      // Solo evaluar si la pregunta actual es visible y tiene skip_logic habilitado
       if (visible.includes(questionId) && question.skip_logic?.enabled && answers[questionId]) {
         const answer = answers[questionId];
-        console.log('Respuesta para saltos:', answer);
-        
-        // Buscar condición que coincida
         const skipCondition = question.skip_logic.conditions.find(condition => {
-          const matches = Array.isArray(answer) 
+          const matches = Array.isArray(answer)
             ? answer.includes(condition.option)
             : answer === condition.option;
-          console.log(`Comparando "${answer}" con "${condition.option}": ${matches}`);
           return matches;
         });
-
         if (skipCondition) {
-          console.log('✅ Condición de salto encontrada:', skipCondition);
-          
           if (skipCondition.skip_to_question === 0) {
-            // Ocultar todas las preguntas después de esta
-            const beforeFilter = [...visible];
             visible = visible.filter(id => {
               const qIndex = form.questions.findIndex(q => q.id === id);
               return qIndex <= i;
             });
-            console.log('Ocultando todas las preguntas después de la actual');
-            console.log('Antes del filtro:', beforeFilter);
-            console.log('Después del filtro:', visible);
           } else {
-            // Ocultar preguntas entre la actual y la de destino
             const targetIndex = skipCondition.skip_to_question - 1;
-            console.log(`🎯 Saltando de pregunta ${i + 1} a pregunta ${targetIndex + 1}`);
-            
             if (targetIndex >= 0 && targetIndex < form.questions.length) {
-              const beforeFilter = [...visible];
-              // Ocultar las preguntas que están entre la actual y la de destino
               visible = visible.filter(id => {
                 const qIndex = form.questions.findIndex(q => q.id === id);
-                // Mantener la pregunta actual y la de destino, ocultar las del medio
-                const shouldKeep = qIndex <= i || qIndex >= targetIndex;
-                console.log(`Pregunta ${qIndex + 1} (ID: ${id}): ${shouldKeep ? 'MANTENER' : 'OCULTAR'}`);
+                let shouldKeep;
+                if (targetIndex > i) {
+                  shouldKeep = qIndex <= i || qIndex >= targetIndex;
+                } else {
+                  shouldKeep = qIndex >= targetIndex && qIndex <= i;
+                }
                 return shouldKeep;
               });
-              console.log('Antes del filtro:', beforeFilter);
-              console.log('Después del filtro:', visible);
-            } else {
-              console.log('❌ Índice de destino inválido:', targetIndex);
             }
           }
-        } else {
-          console.log('❌ No se encontró condición de salto');
         }
-      } else {
-        console.log('❌ No hay skip_logic habilitado, no hay respuesta, o la pregunta no es visible');
       }
     }
 
-    console.log('\n=== RESULTADO FINAL ===');
-    console.log('Preguntas visibles finales:', visible);
-    console.log('=== FIN CÁLCULO ===\n');
+    // Limpiar respuestas de preguntas que ya no están visibles
+    setAnswers(prev => {
+      const cleaned = { ...prev };
+      Object.keys(cleaned).forEach(qid => {
+        if (!visible.includes(Number(qid))) {
+          delete cleaned[qid];
+        }
+      });
+      return cleaned;
+    });
+
     setVisibleQuestions(visible);
   }, [form, answers]);
 
@@ -147,20 +122,14 @@ const FormView: React.FC = () => {
   };
 
   const handleAnswerChange = (questionId: number, value: string | string[]) => {
-    console.log(`Cambiando respuesta para pregunta ${questionId}:`, value);
-    
-    setAnswers(prev => ({
-      ...prev,
-      [questionId]: value
-    }));
-    
-    // Recalcular preguntas visibles inmediatamente después de cambiar una respuesta
-    setTimeout(() => {
-      if (form) {
-        console.log('Recalculando después de cambio de respuesta...');
-        calculateVisibleQuestions();
-      }
-    }, 100);
+    setAnswers(prev => {
+      const updated = { ...prev, [questionId]: value };
+      return updated;
+    });
+    // Recalcular preguntas visibles inmediatamente
+    if (form) {
+      calculateVisibleQuestions();
+    }
   };
 
   const handleCheckboxChange = (questionId: number, option: string, checked: boolean) => {
