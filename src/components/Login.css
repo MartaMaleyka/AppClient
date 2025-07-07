@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   padding: 20px;
 }
 
@@ -75,9 +75,9 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #1e88e5;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
 }
 
 .form-group input::placeholder {
@@ -85,7 +85,7 @@
 }
 
 .login-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: white;
   border: none;
   padding: 14px 24px;
@@ -99,7 +99,7 @@
 
 .login-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 20px rgba(30, 136, 229, 0.3);
 }
 
 .login-button:disabled {
@@ -123,7 +123,7 @@
 .toggle-button {
   background: none;
   border: none;
-  color: #667eea;
+  color: #1e88e5;
   font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
@@ -132,7 +132,7 @@
 }
 
 .toggle-button:hover {
-  color: #5a6fd8;
+  color: #1565c0;
 }
 
 .error-message {

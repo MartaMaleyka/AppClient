@@ -62,7 +62,7 @@
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #1e88e5;
 }
 
 .checkbox-label {
@@ -85,7 +85,7 @@
 }
 
 .add-question-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -97,7 +97,7 @@
 
 .add-question-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(30, 136, 229, 0.4);
 }
 
 .empty-questions {
@@ -228,7 +228,7 @@
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: white;
   border: none;
   padding: 1rem 2rem;
@@ -241,7 +241,7 @@
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(30, 136, 229, 0.4);
 }
 
 .submit-btn:disabled {
@@ -294,9 +294,9 @@
 .skip-logic-info {
   margin-bottom: 1rem;
   padding: 0.75rem;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(30, 136, 229, 0.1);
   border-radius: 6px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #1e88e5;
 }
 
 .skip-logic-info p {
@@ -355,7 +355,7 @@
 
 .condition-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #1e88e5;
 }
 
 .remove-condition-btn {
