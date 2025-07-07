@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './FormView.css';
 
@@ -44,13 +44,7 @@ const FormView: React.FC = () => {
     fetchForm();
   }, [id]);
 
-  useEffect(() => {
-    if (form) {
-      calculateVisibleQuestions();
-    }
-  }, [form, answers]);
-
-  const calculateVisibleQuestions = () => {
+  const calculateVisibleQuestions = useCallback(() => {
     if (!form) return;
 
     console.log('=== INICIO CÁLCULO DE PREGUNTAS VISIBLES ===');
@@ -129,7 +123,13 @@ const FormView: React.FC = () => {
     console.log('Preguntas visibles finales:', visible);
     console.log('=== FIN CÁLCULO ===\n');
     setVisibleQuestions(visible);
-  };
+  }, [form, answers]);
+
+  useEffect(() => {
+    if (form) {
+      calculateVisibleQuestions();
+    }
+  }, [form, answers, calculateVisibleQuestions]);
 
   const fetchForm = async () => {
     try {
