@@ -20,7 +20,7 @@
 }
 
 .create-version-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -29,12 +29,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3);
 }
 
 .create-version-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
 }
 
 .version-list {
@@ -56,8 +56,8 @@
 }
 
 .version-card.active {
-  border: 2px solid #667eea;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+  border: 2px solid #1e88e5;
+  box-shadow: 0 4px 20px rgba(30, 136, 229, 0.15);
 }
 
 .version-card.active::before {
@@ -65,7 +65,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #667eea;
+  background: #1e88e5;
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
@@ -95,7 +95,7 @@
 .version-number {
   display: inline-block;
   background: #f0f8ff;
-  color: #667eea;
+  color: #1e88e5;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -162,13 +162,13 @@
 }
 
 .activate-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: white;
 }
 
 .activate-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
 }
 
 .activate-btn:disabled {

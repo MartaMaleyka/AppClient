@@ -20,7 +20,7 @@
 }
 
 .upload-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -29,12 +29,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3);
 }
 
 .upload-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
 }
 
 .file-filters {
@@ -68,7 +68,7 @@
 .filter-group select:focus,
 .filter-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #1e88e5;
 }
 
 .file-stats {
@@ -125,7 +125,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #1e88e5, #1565c0);
 }
 
 .file-card:hover {

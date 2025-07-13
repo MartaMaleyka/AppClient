@@ -35,13 +35,13 @@
 }
 
 .mark-all-read-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: white;
 }
 
 .mark-all-read-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
 }
 
 .clear-all-btn {
@@ -84,7 +84,7 @@
 
 .filter-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #1e88e5;
 }
 
 .notification-list {
@@ -106,7 +106,7 @@
 }
 
 .notification-item.unread {
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #1e88e5;
   background: #f8f9ff;
 }
 
@@ -122,7 +122,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #1e88e5, #1565c0);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -208,12 +208,12 @@
 
 .mark-read-btn {
   background: #f0f8ff;
-  color: #667eea;
+  color: #1e88e5;
   border: 1px solid #e0e0e0;
 }
 
 .mark-read-btn:hover {
-  background: #667eea;
+  background: #1e88e5;
   color: white;
 }
 

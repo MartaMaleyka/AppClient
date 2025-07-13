@@ -5,7 +5,7 @@ import './FormView.css';
 interface Question {
   id: number;
   question_text: string;
-  question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'date' | 'time' | 'datetime-local';
+  question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'date' | 'time' | 'datetime-local' | 'email' | 'number';
   options: string[];
   required: boolean;
   skip_logic?: {
@@ -13,6 +13,14 @@ interface Question {
     conditions: {
       option: string;
       skip_to_question: number;
+    }[];
+  };
+  validations?: {
+    enabled: boolean;
+    rules: {
+      validation_type: string;
+      validation_rule: string;
+      error_message: string;
     }[];
   };
 }
@@ -39,6 +47,7 @@ const FormView: React.FC = () => {
   const [respondentName, setRespondentName] = useState('');
   const [answers, setAnswers] = useState<{ [key: number]: string | string[] }>({});
   const [visibleQuestions, setVisibleQuestions] = useState<number[]>([]);
+  const [validationErrors, setValidationErrors] = useState<{ [key: number]: string }>({});
 
   useEffect(() => {
     fetchForm();
@@ -142,12 +151,125 @@ const FormView: React.FC = () => {
     }
   };
 
-  const validateForm = () => {
+  // Función para validar un valor según las reglas de validación
+  const validateField = async (questionId: number, value: string) => {
+    const question = form?.questions.find(q => q.id === questionId);
+    if (!question || !question.validations?.enabled || !question.validations.rules.length) {
+      return null;
+    }
+
+    for (const rule of question.validations.rules) {
+      let isValid = true;
+      
+      switch (rule.validation_type) {
+        case 'regex':
+          try {
+            const regex = new RegExp(rule.validation_rule);
+            isValid = regex.test(value);
+          } catch (e) {
+            isValid = false;
+          }
+          break;
+          
+        case 'length':
+          try {
+            const params = JSON.parse(rule.validation_rule);
+            const length = value ? value.length : 0;
+            const minLength = params.min_length || 0;
+            const maxLength = params.max_length || Infinity;
+            isValid = length >= minLength && length <= maxLength;
+          } catch (e) {
+            isValid = false;
+          }
+          break;
+          
+        case 'range':
+          try {
+            const params = JSON.parse(rule.validation_rule);
+            const numValue = parseFloat(value);
+            const minValue = params.min_value || -Infinity;
+            const maxValue = params.max_value || Infinity;
+            isValid = !isNaN(numValue) && numValue >= minValue && numValue <= maxValue;
+          } catch (e) {
+            isValid = false;
+          }
+          break;
+          
+        case 'email':
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          isValid = emailRegex.test(value);
+          break;
+          
+        case 'url':
+          try {
+            new URL(value);
+            isValid = true;
+          } catch (e) {
+            isValid = false;
+          }
+          break;
+          
+        case 'phone':
+          const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+          isValid = phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''));
+          break;
+          
+        case 'custom':
+          try {
+            const func = new Function('value', rule.validation_rule);
+            isValid = func(value);
+          } catch (e) {
+            isValid = false;
+          }
+          break;
+          
+        default:
+          isValid = true;
+      }
+      
+      if (!isValid) {
+        return rule.error_message || 'Valor inválido';
+      }
+    }
+    
+    return null; // No hay errores
+  };
+
+  // Función para manejar cambios con validación en tiempo real
+  const handleAnswerChangeWithValidation = async (questionId: number, value: string | string[]) => {
+    setAnswers(prev => {
+      const updated = { ...prev, [questionId]: value };
+      return updated;
+    });
+
+    // Validar en tiempo real si es un string
+    if (typeof value === 'string') {
+      const error = await validateField(questionId, value);
+      setValidationErrors(prev => ({
+        ...prev,
+        [questionId]: error || ''
+      }));
+    } else {
+      // Para arrays (checkboxes), limpiar error
+      setValidationErrors(prev => ({
+        ...prev,
+        [questionId]: ''
+      }));
+    }
+
+    // Recalcular preguntas visibles inmediatamente
+    if (form) {
+      calculateVisibleQuestions();
+    }
+  };
+
+  const validateForm = async () => {
     if (!respondentName.trim()) {
       setError('Por favor ingresa tu nombre');
       return false;
     }
 
+    // Validar campos requeridos
     for (const question of form!.questions) {
       if (question.required && visibleQuestions.includes(question.id)) {
         const answer = answers[question.id];
@@ -160,13 +282,27 @@ const FormView: React.FC = () => {
       }
     }
 
+    // Validar campos con validaciones personalizadas
+    for (const question of form!.questions) {
+      if (visibleQuestions.includes(question.id) && question.validations?.enabled) {
+        const answer = answers[question.id];
+        if (answer && typeof answer === 'string') {
+          const error = await validateField(question.id, answer);
+          if (error) {
+            setError(`Error en "${question.question_text}": ${error}`);
+            return false;
+          }
+        }
+      }
+    }
+
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    if (!(await validateForm())) {
       return;
     }
 
@@ -208,6 +344,7 @@ const FormView: React.FC = () => {
     const questionId = question.id;
     const currentAnswer = answers[questionId];
     const isVisible = visibleQuestions.includes(questionId);
+    const validationError = validationErrors[questionId];
 
     return (
       <div 
@@ -226,23 +363,63 @@ const FormView: React.FC = () => {
 
         <div className="question-content">
           {question.question_type === 'text' && (
-            <input
-              type="text"
-              value={currentAnswer as string || ''}
-              onChange={(e) => handleAnswerChange(questionId, e.target.value)}
-              placeholder="Escribe tu respuesta aquí..."
-              className="text-input"
-            />
+            <div className="input-group">
+              <input
+                type="text"
+                value={currentAnswer as string || ''}
+                onChange={(e) => handleAnswerChangeWithValidation(questionId, e.target.value)}
+                placeholder="Escribe tu respuesta aquí..."
+                className={`text-input ${validationError ? 'input-error' : ''}`}
+              />
+              {validationError && (
+                <div className="validation-error">{validationError}</div>
+              )}
+            </div>
           )}
 
           {question.question_type === 'textarea' && (
-            <textarea
-              value={currentAnswer as string || ''}
-              onChange={(e) => handleAnswerChange(questionId, e.target.value)}
-              placeholder="Escribe tu respuesta aquí..."
-              rows={4}
-              className="textarea-input"
-            />
+            <div className="input-group">
+              <textarea
+                value={currentAnswer as string || ''}
+                onChange={(e) => handleAnswerChangeWithValidation(questionId, e.target.value)}
+                placeholder="Escribe tu respuesta aquí..."
+                rows={4}
+                className={`textarea-input ${validationError ? 'input-error' : ''}`}
+              />
+              {validationError && (
+                <div className="validation-error">{validationError}</div>
+              )}
+            </div>
+          )}
+
+          {question.question_type === 'email' && (
+            <div className="input-group">
+              <input
+                type="email"
+                value={currentAnswer as string || ''}
+                onChange={(e) => handleAnswerChangeWithValidation(questionId, e.target.value)}
+                placeholder="ejemplo@email.com"
+                className={`text-input ${validationError ? 'input-error' : ''}`}
+              />
+              {validationError && (
+                <div className="validation-error">{validationError}</div>
+              )}
+            </div>
+          )}
+
+          {question.question_type === 'number' && (
+            <div className="input-group">
+              <input
+                type="number"
+                value={currentAnswer as string || ''}
+                onChange={(e) => handleAnswerChangeWithValidation(questionId, e.target.value)}
+                placeholder="Ingresa un número"
+                className={`text-input ${validationError ? 'input-error' : ''}`}
+              />
+              {validationError && (
+                <div className="validation-error">{validationError}</div>
+              )}
+            </div>
           )}
 
           {question.question_type === 'radio' && (
