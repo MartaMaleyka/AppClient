@@ -56,7 +56,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
         date_range: dateRange
       });
       
-      const response = await fetch(`/api/analytics/dashboard?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/analytics/dashboard?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -78,7 +78,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
 
   const fetchForms = async () => {
     try {
-      const response = await fetch('/api/forms', {
+      const response = await fetch('http://localhost:5000/api/forms', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -101,7 +101,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
         format: 'csv'
       });
       
-      const response = await fetch(`/api/analytics/export?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/analytics/export?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -118,17 +118,17 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       } else {
-        alert('Error exporting data');
+        alert('Error al exportar datos');
       }
     } catch (error) {
       console.error('Error exporting data:', error);
-      alert('Error exporting data');
+      alert('Error al exportar datos');
     }
   };
 
   const handleGenerateReport = async (reportData: any) => {
     try {
-      const response = await fetch('/api/analytics/reports', {
+      const response = await fetch('http://localhost:5000/api/analytics/reports', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -151,13 +151,13 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        alert('Report generated successfully!');
+        alert('¡Reporte generado exitosamente!');
       } else {
-        alert('Error generating report');
+        alert('Error al generar reporte');
       }
     } catch (error) {
       console.error('Error generating report:', error);
-      alert('Error generating report');
+      alert('Error al generar reporte');
     }
   };
 
@@ -193,8 +193,8 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
   if (!analyticsData) {
     return (
       <div className="empty-analytics">
-        <h3>No analytics data available</h3>
-        <p>Start creating forms and collecting responses to see analytics data.</p>
+        <h3>No hay datos de analytics disponibles</h3>
+        <p>Comienza a crear formularios y recopilar respuestas para ver datos de analytics.</p>
       </div>
     );
   }
@@ -202,20 +202,20 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
   return (
     <div className="analytics-dashboard">
       <div className="analytics-header">
-        <h2>Analytics Dashboard</h2>
+        <h2>Panel de Analytics</h2>
         <button className="export-btn" onClick={handleExportData}>
-          Export Data
+          Exportar Datos
         </button>
       </div>
 
       <div className="analytics-filters">
         <div className="filter-group">
-          <label>Form</label>
+          <label>Formulario</label>
           <select 
             value={selectedForm} 
             onChange={(e) => setSelectedForm(e.target.value)}
           >
-            <option value="all">All Forms</option>
+            <option value="all">Todos los Formularios</option>
             {forms.map(form => (
               <option key={form.id} value={form.id}>
                 {form.title}
@@ -225,89 +225,89 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
         </div>
 
         <div className="filter-group">
-          <label>Date Range</label>
+          <label>Rango de Fechas</label>
           <select 
             value={dateRange} 
             onChange={(e) => setDateRange(e.target.value)}
           >
-            <option value="1d">Last 24 hours</option>
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-            <option value="1y">Last year</option>
+            <option value="1d">Últimas 24 horas</option>
+            <option value="7d">Últimos 7 días</option>
+            <option value="30d">Últimos 30 días</option>
+            <option value="90d">Últimos 90 días</option>
+            <option value="1y">Último año</option>
           </select>
         </div>
       </div>
 
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-title">Total Forms</div>
+          <div className="stat-title">Total de Formularios</div>
           <div className="stat-value">{formatNumber(analyticsData.total_forms)}</div>
-          <div className="stat-change positive">+{analyticsData.forms_created} this period</div>
+          <div className="stat-change positive">+{analyticsData.forms_created} en este período</div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-title">Total Responses</div>
+          <div className="stat-title">Total de Respuestas</div>
           <div className="stat-value">{formatNumber(analyticsData.total_responses)}</div>
-          <div className="stat-change positive">+{analyticsData.responses_today} today</div>
+          <div className="stat-change positive">+{analyticsData.responses_today} hoy</div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-title">Total Views</div>
+          <div className="stat-title">Total de Vistas</div>
           <div className="stat-value">{formatNumber(analyticsData.total_views)}</div>
-          <div className="stat-change positive">+{analyticsData.views_today} today</div>
+          <div className="stat-change positive">+{analyticsData.views_today} hoy</div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-title">Completion Rate</div>
+          <div className="stat-title">Tasa de Completado</div>
           <div className="stat-value">{formatPercentage(analyticsData.avg_completion_rate)}</div>
-          <div className="stat-change positive">+{analyticsData.recent_responses} recent</div>
+          <div className="stat-change positive">+{analyticsData.recent_responses} recientes</div>
         </div>
       </div>
 
       <div className="charts-section">
         <div className="chart-container">
           <div className="chart-header">
-            <h3 className="chart-title">Response Trends</h3>
+            <h3 className="chart-title">Tendencias de Respuestas</h3>
             <div className="chart-legend">
               <div className="legend-item">
                 <div className="legend-color" style={{ backgroundColor: '#667eea' }}></div>
-                <span>Responses</span>
+                <span>Respuestas</span>
               </div>
               <div className="legend-item">
                 <div className="legend-color" style={{ backgroundColor: '#764ba2' }}></div>
-                <span>Views</span>
+                <span>Vistas</span>
               </div>
             </div>
           </div>
           <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-            Chart visualization would be implemented here with a charting library like Chart.js
+            La visualización del gráfico se implementaría aquí con una biblioteca de gráficos como Chart.js
           </div>
         </div>
 
         <div className="chart-container">
           <div className="chart-header">
-            <h3 className="chart-title">Response Status</h3>
+            <h3 className="chart-title">Estado de Respuestas</h3>
           </div>
           <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-            Pie chart visualization would be implemented here
+            La visualización del gráfico circular se implementaría aquí
           </div>
         </div>
       </div>
 
       <div className="responses-table">
         <div className="table-header">
-          <h3 className="table-title">Recent Responses</h3>
+          <h3 className="table-title">Respuestas Recientes</h3>
         </div>
         <div className="table-container">
           <table className="analytics-table">
             <thead>
               <tr>
-                <th>Form</th>
-                <th>Respondent</th>
-                <th>Status</th>
-                <th>Submitted</th>
-                <th>Completion Time</th>
+                <th>Formulario</th>
+                <th>Respondente</th>
+                <th>Estado</th>
+                <th>Enviado</th>
+                <th>Tiempo de Completado</th>
               </tr>
             </thead>
             <tbody>
@@ -317,7 +317,9 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
                   <td>{response.respondent_name}</td>
                   <td>
                     <span className={`response-status status-${response.status}`}>
-                      {response.status}
+                      {response.status === 'completed' ? 'Completado' : 
+                       response.status === 'pending' ? 'Pendiente' : 
+                       response.status === 'abandoned' ? 'Abandonado' : response.status}
                     </span>
                   </td>
                   <td>{formatDate(response.submitted_at)}</td>
@@ -336,36 +338,36 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
 
       <div className="report-builder">
         <div className="report-header">
-          <h3 className="report-title">Custom Report Builder</h3>
+          <h3 className="report-title">Constructor de Reportes Personalizados</h3>
         </div>
         <div className="report-form">
           <div className="form-group">
-            <label>Report Type</label>
+            <label>Tipo de Reporte</label>
             <select id="reportType">
-              <option value="summary">Summary Report</option>
-              <option value="detailed">Detailed Report</option>
-              <option value="comparison">Comparison Report</option>
+              <option value="summary">Reporte Resumen</option>
+              <option value="detailed">Reporte Detallado</option>
+              <option value="comparison">Reporte de Comparación</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label>Include Charts</label>
+            <label>Incluir Gráficos</label>
             <select id="includeCharts">
-              <option value="true">Yes</option>
+              <option value="true">Sí</option>
               <option value="false">No</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label>Include Raw Data</label>
+            <label>Incluir Datos Crudos</label>
             <select id="includeRawData">
-              <option value="true">Yes</option>
+              <option value="true">Sí</option>
               <option value="false">No</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label>Format</label>
+            <label>Formato</label>
             <select id="format">
               <option value="pdf">PDF</option>
               <option value="excel">Excel</option>
@@ -382,7 +384,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ formId }) => {
             format: (document.getElementById('format') as HTMLSelectElement)?.value
           })}
         >
-          Generate Report
+          Generar Reporte
         </button>
       </div>
     </div>

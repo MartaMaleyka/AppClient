@@ -19,7 +19,7 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({ className = '' })
 
   const fetchUnreadCount = async () => {
     try {
-      const response = await fetch('/api/notifications/unread-count', {
+      const response = await fetch('http://localhost:5000/api/notifications/unread-count', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

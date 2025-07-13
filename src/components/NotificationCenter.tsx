@@ -36,11 +36,12 @@ const NotificationCenter: React.FC = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/notifications', {
+      const response = await fetch('http://localhost:5000/api/notifications', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+      
       if (response.ok) {
         const data = await response.json();
         setNotifications(data);
@@ -56,11 +57,12 @@ const NotificationCenter: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/notifications/stats', {
+      const response = await fetch('http://localhost:5000/api/notifications/stats', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+      
       if (response.ok) {
         const data = await response.json();
         setStats(data);
@@ -72,7 +74,7 @@ const NotificationCenter: React.FC = () => {
 
   const handleMarkAsRead = async (notificationId: number) => {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
+      const response = await fetch(`http://localhost:5000/api/notifications/${notificationId}/read`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -96,32 +98,31 @@ const NotificationCenter: React.FC = () => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      const response = await fetch('/api/notifications/mark-all-read', {
+      const response = await fetch('http://localhost:5000/api/notifications/mark-all-read', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
+      
       if (response.ok) {
-        setNotifications(prev => 
-          prev.map(notification => ({ ...notification, is_read: true }))
-        );
-        fetchStats();
-        alert('All notifications marked as read!');
+        setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+        if (stats) {
+          setStats({ ...stats, unread: 0 });
+        }
       }
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      console.error('Error marking all as read:', error);
     }
   };
 
   const handleDeleteNotification = async (notificationId: number) => {
-    if (!window.confirm('Are you sure you want to delete this notification?')) {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta notificación?')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/notifications/${notificationId}`, {
+      const response = await fetch(`http://localhost:5000/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -131,7 +132,7 @@ const NotificationCenter: React.FC = () => {
       if (response.ok) {
         setNotifications(prev => prev.filter(n => n.id !== notificationId));
         fetchStats();
-        alert('Notification deleted successfully!');
+        alert('¡Notificación eliminada exitosamente!');
       }
     } catch (error) {
       console.error('Error deleting notification:', error);
@@ -139,22 +140,23 @@ const NotificationCenter: React.FC = () => {
   };
 
   const handleClearAll = async () => {
-    if (!window.confirm('Are you sure you want to delete all notifications?')) {
+    if (!window.confirm('¿Estás seguro de que quieres limpiar todas las notificaciones?')) {
       return;
     }
 
     try {
-      const response = await fetch('/api/notifications/clear-all', {
+      const response = await fetch('http://localhost:5000/api/notifications/clear-all', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
+      
       if (response.ok) {
         setNotifications([]);
-        fetchStats();
-        alert('All notifications cleared!');
+        if (stats) {
+          setStats({ ...stats, total: 0, unread: 0 });
+        }
       }
     } catch (error) {
       console.error('Error clearing notifications:', error);
@@ -173,13 +175,13 @@ const NotificationCenter: React.FC = () => {
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 1) {
-      return 'Just now';
+      return 'Hace un momento';
     } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)} hours ago`;
+      return `Hace ${Math.floor(diffInHours)} horas`;
     } else if (diffInHours < 48) {
-      return 'Yesterday';
+      return 'Ayer';
     } else {
-      return date.toLocaleDateString();
+      return date.toLocaleDateString('es-ES');
     }
   };
 
@@ -204,13 +206,13 @@ const NotificationCenter: React.FC = () => {
   return (
     <div className="notification-center">
       <div className="notification-header">
-        <h2>Notifications</h2>
+        <h2>Notificaciones</h2>
         <div className="notification-actions">
           <button className="notification-btn mark-all-read-btn" onClick={handleMarkAllAsRead}>
-            Mark All Read
+            Marcar Todo como Leído
           </button>
           <button className="notification-btn clear-all-btn" onClick={handleClearAll}>
-            Clear All
+            Limpiar Todo
           </button>
         </div>
       </div>
@@ -223,19 +225,19 @@ const NotificationCenter: React.FC = () => {
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.unread}</span>
-            <span className="stat-label">Unread</span>
+            <span className="stat-label">No Leídas</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.info_count}</span>
-            <span className="stat-label">Info</span>
+            <span className="stat-label">Información</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.success_count}</span>
-            <span className="stat-label">Success</span>
+            <span className="stat-label">Éxito</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.warning_count}</span>
-            <span className="stat-label">Warning</span>
+            <span className="stat-label">Advertencia</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.error_count}</span>
@@ -246,38 +248,38 @@ const NotificationCenter: React.FC = () => {
 
       <div className="notification-filters">
         <div className="filter-group">
-          <label>Type</label>
+                        <label>Tipo</label>
           <select 
             value={selectedType} 
             onChange={(e) => setSelectedType(e.target.value)}
           >
-            <option value="all">All Types</option>
-            <option value="info">Info</option>
-            <option value="success">Success</option>
-            <option value="warning">Warning</option>
+            <option value="all">Todos los Tipos</option>
+            <option value="info">Información</option>
+            <option value="success">Éxito</option>
+            <option value="warning">Advertencia</option>
             <option value="error">Error</option>
           </select>
         </div>
 
         <div className="filter-group">
-          <label>Status</label>
+                        <label>Estado</label>
           <select 
             value={showUnreadOnly ? 'unread' : 'all'} 
             onChange={(e) => setShowUnreadOnly(e.target.value === 'unread')}
           >
-            <option value="all">All Notifications</option>
-            <option value="unread">Unread Only</option>
+            <option value="all">Todas las Notificaciones</option>
+            <option value="unread">Solo No Leídas</option>
           </select>
         </div>
       </div>
 
       {filteredNotifications.length === 0 ? (
         <div className="empty-notifications">
-          <h3>No notifications found</h3>
+          <h3>No se encontraron notificaciones</h3>
           <p>
             {selectedType !== 'all' || showUnreadOnly 
-              ? 'Try adjusting your filters to see more notifications.'
-              : 'You\'re all caught up! No notifications at the moment.'
+              ? 'Intenta ajustar tus filtros para ver más notificaciones.'
+              : '¡Estás al día! No hay notificaciones en este momento.'
             }
           </p>
         </div>
@@ -298,7 +300,7 @@ const NotificationCenter: React.FC = () => {
 
               {notification.form_title && (
                 <p style={{ fontSize: '12px', color: '#888', marginBottom: '10px' }}>
-                  Related to: <strong>{notification.form_title}</strong>
+                  Relacionado con: <strong>{notification.form_title}</strong>
                 </p>
               )}
 
@@ -310,14 +312,14 @@ const NotificationCenter: React.FC = () => {
                       className="notification-action-btn mark-read-btn"
                       onClick={() => handleMarkAsRead(notification.id)}
                     >
-                      Mark Read
+                      Marcar como Leído
                     </button>
                   )}
                   <button 
                     className="notification-action-btn delete-notification-btn"
                     onClick={() => handleDeleteNotification(notification.id)}
                   >
-                    Delete
+                    Eliminar
                   </button>
                 </div>
               </div>

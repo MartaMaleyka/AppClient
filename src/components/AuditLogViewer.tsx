@@ -79,7 +79,7 @@ const AuditLogViewer: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/audit-logs/stats', {
+      const response = await fetch('http://localhost:5000/api/audit-logs/stats', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -105,7 +105,7 @@ const AuditLogViewer: React.FC = () => {
         format: 'csv'
       });
       
-      const response = await fetch(`/api/audit-logs/export?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/audit-logs/export?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -121,13 +121,13 @@ const AuditLogViewer: React.FC = () => {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        alert('Audit logs exported successfully!');
+        alert('¡Logs de auditoría exportados exitosamente!');
       } else {
-        alert('Error exporting audit logs');
+        alert('Error al exportar logs de auditoría');
       }
     } catch (error) {
       console.error('Error exporting logs:', error);
-      alert('Error exporting audit logs');
+      alert('Error al exportar logs de auditoría');
     }
   };
 
@@ -154,13 +154,13 @@ const AuditLogViewer: React.FC = () => {
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 1) {
-      return 'Just now';
+      return 'Hace un momento';
     } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)} hours ago`;
+      return `Hace ${Math.floor(diffInHours)} horas`;
     } else if (diffInHours < 48) {
-      return 'Yesterday';
+      return 'Ayer';
     } else {
-      return date.toLocaleDateString();
+      return date.toLocaleDateString('es-ES');
     }
   };
 
@@ -197,9 +197,9 @@ const AuditLogViewer: React.FC = () => {
   return (
     <div className="audit-log-viewer">
       <div className="audit-header">
-        <h2>Audit Log Viewer</h2>
+        <h2>Visor de Logs de Auditoría</h2>
         <button className="export-logs-btn" onClick={handleExportLogs}>
-          Export Logs
+          Exportar Logs
         </button>
       </div>
 
@@ -207,69 +207,69 @@ const AuditLogViewer: React.FC = () => {
         <div className="audit-stats">
           <div className="stat-item">
             <span className="stat-number">{stats.total_logs}</span>
-            <span className="stat-label">Total Logs</span>
+            <span className="stat-label">Total de Logs</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.today_logs}</span>
-            <span className="stat-label">Today</span>
+            <span className="stat-label">Hoy</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.critical_logs}</span>
-            <span className="stat-label">Critical</span>
+            <span className="stat-label">Crítico</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.high_severity_logs}</span>
-            <span className="stat-label">High</span>
+            <span className="stat-label">Alto</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.medium_severity_logs}</span>
-            <span className="stat-label">Medium</span>
+            <span className="stat-label">Medio</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.low_severity_logs}</span>
-            <span className="stat-label">Low</span>
+            <span className="stat-label">Bajo</span>
           </div>
         </div>
       )}
 
       <div className="audit-filters">
         <div className="filter-group">
-          <label>Action Type</label>
+          <label>Tipo de Acción</label>
           <select 
             value={selectedAction} 
             onChange={(e) => setSelectedAction(e.target.value)}
           >
-            <option value="all">All Actions</option>
-            <option value="create">Create</option>
-            <option value="update">Update</option>
-            <option value="delete">Delete</option>
-            <option value="login">Login</option>
-            <option value="logout">Logout</option>
-            <option value="export">Export</option>
+            <option value="all">Todas las Acciones</option>
+            <option value="create">Crear</option>
+            <option value="update">Actualizar</option>
+            <option value="delete">Eliminar</option>
+            <option value="login">Iniciar Sesión</option>
+            <option value="logout">Cerrar Sesión</option>
+            <option value="export">Exportar</option>
           </select>
         </div>
 
         <div className="filter-group">
-          <label>Severity Level</label>
+          <label>Nivel de Severidad</label>
           <select 
             value={selectedSeverity} 
             onChange={(e) => setSelectedSeverity(e.target.value)}
           >
-            <option value="all">All Severities</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="critical">Critical</option>
+            <option value="all">Todas las Severidades</option>
+            <option value="low">Bajo</option>
+            <option value="medium">Medio</option>
+            <option value="high">Alto</option>
+            <option value="critical">Crítico</option>
           </select>
         </div>
 
         <div className="filter-group">
-          <label>User</label>
+          <label>Usuario</label>
           <select 
             value={selectedUser} 
             onChange={(e) => setSelectedUser(e.target.value)}
           >
-            <option value="all">All Users</option>
+            <option value="all">Todos los Usuarios</option>
             <option value="1">User 1</option>
             <option value="2">User 2</option>
             {/* This would be populated with actual users */}
@@ -277,7 +277,7 @@ const AuditLogViewer: React.FC = () => {
         </div>
 
         <div className="filter-group">
-          <label>Date From</label>
+          <label>Fecha Desde</label>
           <input
             type="date"
             value={dateFrom}
@@ -286,7 +286,7 @@ const AuditLogViewer: React.FC = () => {
         </div>
 
         <div className="filter-group">
-          <label>Date To</label>
+          <label>Fecha Hasta</label>
           <input
             type="date"
             value={dateTo}
@@ -297,25 +297,25 @@ const AuditLogViewer: React.FC = () => {
 
       {logs.length === 0 ? (
         <div className="empty-logs">
-          <h3>No audit logs found</h3>
-          <p>Try adjusting your filters to see more logs.</p>
+          <h3>No se encontraron logs de auditoría</h3>
+          <p>Intenta ajustar tus filtros para ver más logs.</p>
         </div>
       ) : (
         <div className="audit-table">
           <div className="table-header">
-            <h3 className="table-title">Audit Logs</h3>
+            <h3 className="table-title">Logs de Auditoría</h3>
           </div>
           <div className="table-container">
             <table className="audit-table-content">
               <thead>
                 <tr>
-                  <th>User</th>
-                  <th>Action</th>
-                  <th>Entity</th>
-                  <th>Severity</th>
-                  <th>Details</th>
-                  <th>IP Address</th>
-                  <th>Timestamp</th>
+                  <th>Usuario</th>
+                  <th>Acción</th>
+                  <th>Entidad</th>
+                  <th>Severidad</th>
+                  <th>Detalles</th>
+                  <th>Dirección IP</th>
+                  <th>Marca de Tiempo</th>
                 </tr>
               </thead>
               <tbody>
@@ -340,7 +340,7 @@ const AuditLogViewer: React.FC = () => {
                           className="expand-details-btn"
                           onClick={() => handleToggleDetails(log.id)}
                         >
-                          {expandedDetails.includes(log.id) ? 'Show less' : 'Show more'}
+                          {expandedDetails.includes(log.id) ? 'Mostrar menos' : 'Mostrar más'}
                         </button>
                       </div>
                     </td>
@@ -361,13 +361,13 @@ const AuditLogViewer: React.FC = () => {
 
       {totalPages > 1 && (
         <div className="pagination">
-          <button 
-            className="pagination-btn"
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
+                      <button 
+              className="pagination-btn"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </button>
           
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
             const page = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
@@ -382,13 +382,13 @@ const AuditLogViewer: React.FC = () => {
             );
           })}
           
-          <button 
-            className="pagination-btn"
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+                      <button 
+              className="pagination-btn"
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </button>
         </div>
       )}
 
@@ -396,19 +396,19 @@ const AuditLogViewer: React.FC = () => {
         <div className="log-modal">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>Log Details</h3>
+              <h3>Detalles del Log</h3>
               <button className="close-btn" onClick={() => setShowLogModal(false)}>
                 ×
               </button>
             </div>
             
             <div className="log-detail-item">
-              <div className="log-detail-label">User</div>
+              <div className="log-detail-label">Usuario</div>
               <div className="log-detail-value">{selectedLog.username}</div>
             </div>
             
             <div className="log-detail-item">
-              <div className="log-detail-label">Action</div>
+              <div className="log-detail-label">Acción</div>
               <div className="log-detail-value">
                 <span className={`action-type action-${selectedLog.action_type}`}>
                   {selectedLog.action_type}
@@ -417,19 +417,19 @@ const AuditLogViewer: React.FC = () => {
             </div>
             
             <div className="log-detail-item">
-              <div className="log-detail-label">Entity Type</div>
+              <div className="log-detail-label">Tipo de Entidad</div>
               <div className="log-detail-value">{selectedLog.entity_type}</div>
             </div>
             
             {selectedLog.entity_id && (
               <div className="log-detail-item">
-                <div className="log-detail-label">Entity ID</div>
+                <div className="log-detail-label">ID de Entidad</div>
                 <div className="log-detail-value">{selectedLog.entity_id}</div>
               </div>
             )}
             
             <div className="log-detail-item">
-              <div className="log-detail-label">Severity</div>
+              <div className="log-detail-label">Severidad</div>
               <div className="log-detail-value">
                 <span className={`severity-level severity-${selectedLog.severity_level}`}>
                   {selectedLog.severity_level}
@@ -438,22 +438,22 @@ const AuditLogViewer: React.FC = () => {
             </div>
             
             <div className="log-detail-item">
-              <div className="log-detail-label">Details</div>
+              <div className="log-detail-label">Detalles</div>
               <div className="log-detail-value">{selectedLog.details}</div>
             </div>
             
             <div className="log-detail-item">
-              <div className="log-detail-label">IP Address</div>
+              <div className="log-detail-label">Dirección IP</div>
               <div className="log-detail-value">{selectedLog.ip_address}</div>
             </div>
             
             <div className="log-detail-item">
-              <div className="log-detail-label">User Agent</div>
+              <div className="log-detail-label">Agente de Usuario</div>
               <div className="log-detail-value">{selectedLog.user_agent}</div>
             </div>
             
             <div className="log-detail-item">
-              <div className="log-detail-label">Timestamp</div>
+              <div className="log-detail-label">Marca de Tiempo</div>
               <div className="log-detail-value">{formatDate(selectedLog.created_at)}</div>
             </div>
           </div>

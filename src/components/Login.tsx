@@ -47,17 +47,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'An error occurred');
+        throw new Error(data.error || 'Ocurrió un error');
       }
 
-      // Store token in localStorage
+      // Almacenar token en localStorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      // Call the onLogin callback
+      // Llamar al callback de login
       onLogin(data.token, data.user);
 
-      // Navigate to home page
+      // Navegar a la página principal
       navigate('/');
     } catch (err: any) {
       setError(err.message);
@@ -95,7 +95,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               value={formData.username}
               onChange={handleInputChange}
               required
-              placeholder="Enter your username"
+              placeholder="Ingresa tu nombre de usuario"
             />
           </div>
 
@@ -109,7 +109,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                placeholder="Enter your email"
+                placeholder="Ingresa tu correo electrónico"
               />
             </div>
           )}
@@ -123,7 +123,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               value={formData.password}
               onChange={handleInputChange}
               required
-              placeholder="Enter your password"
+              placeholder="Ingresa tu contraseña"
             />
           </div>
 
@@ -137,7 +137,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 required
-                placeholder="Confirm your password"
+                placeholder="Confirma tu contraseña"
               />
             </div>
           )}
@@ -160,9 +160,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
         {isLogin && (
           <div className="demo-credentials">
-            <p><strong>Demo Credentials:</strong></p>
-            <p>Username: admin</p>
-            <p>Password: password</p>
+            <p><strong>Credenciales de Demo:</strong></p>
+            <p>Usuario: admin</p>
+            <p>Contraseña: password</p>
           </div>
         )}
       </div>

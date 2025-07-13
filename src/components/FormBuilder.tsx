@@ -157,7 +157,7 @@ const FormBuilder: React.FC = () => {
       return;
     }
 
-    // Validate questions
+    // Validar preguntas
     for (const question of questions) {
       if (!question.question_text.trim()) {
         setError('Todas las preguntas deben tener texto');

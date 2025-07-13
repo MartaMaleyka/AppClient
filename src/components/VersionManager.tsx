@@ -50,7 +50,7 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
   const fetchVersions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/forms/${formId}/versions`);
+      const response = await fetch(`http://localhost:5000/api/forms/${formId}/versions`);
       if (response.ok) {
         const data = await response.json();
         setVersions(data);
@@ -66,7 +66,7 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
 
   const handleCreateVersion = async () => {
     try {
-      const response = await fetch(`/api/forms/${formId}/versions`, {
+      const response = await fetch(`http://localhost:5000/api/forms/${formId}/versions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,19 +76,19 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
 
       if (response.ok) {
         fetchVersions();
-        alert('Version created successfully!');
+        alert('¡Versión creada exitosamente!');
       } else {
-        alert('Error creating version');
+        alert('Error al crear versión');
       }
     } catch (error) {
       console.error('Error creating version:', error);
-      alert('Error creating version');
+      alert('Error al crear versión');
     }
   };
 
   const handleActivateVersion = async (versionId: number) => {
     try {
-      const response = await fetch(`/api/forms/${formId}/versions/${versionId}/activate`, {
+      const response = await fetch(`http://localhost:5000/api/forms/${formId}/versions/${versionId}/activate`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -97,23 +97,23 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
 
       if (response.ok) {
         fetchVersions();
-        alert('Version activated successfully!');
+        alert('¡Versión activada exitosamente!');
       } else {
-        alert('Error activating version');
+        alert('Error al activar versión');
       }
     } catch (error) {
       console.error('Error activating version:', error);
-      alert('Error activating version');
+      alert('Error al activar versión');
     }
   };
 
   const handleDeleteVersion = async (versionId: number) => {
-    if (!window.confirm('Are you sure you want to delete this version?')) {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta versión?')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/forms/${formId}/versions/${versionId}`, {
+      const response = await fetch(`http://localhost:5000/api/forms/${formId}/versions/${versionId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -122,24 +122,24 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
 
       if (response.ok) {
         fetchVersions();
-        alert('Version deleted successfully!');
+        alert('¡Versión eliminada exitosamente!');
       } else {
-        alert('Error deleting version');
+        alert('Error al eliminar versión');
       }
     } catch (error) {
       console.error('Error deleting version:', error);
-      alert('Error deleting version');
+      alert('Error al eliminar versión');
     }
   };
 
   const handleCompareVersions = async () => {
     if (!selectedVersion1 || !selectedVersion2) {
-      alert('Please select two versions to compare');
+      alert('Por favor selecciona dos versiones para comparar');
       return;
     }
 
     try {
-      const response = await fetch(`/api/forms/${formId}/versions/compare`, {
+      const response = await fetch(`http://localhost:5000/api/forms/${formId}/versions/compare`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -156,11 +156,11 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
         setComparison(data);
         setShowCompareModal(true);
       } else {
-        alert('Error comparing versions');
+        alert('Error al comparar versiones');
       }
     } catch (error) {
       console.error('Error comparing versions:', error);
-      alert('Error comparing versions');
+      alert('Error al comparar versiones');
     }
   };
 
@@ -179,18 +179,18 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
   return (
     <div className="version-manager">
       <div className="version-header">
-        <h2>Version Manager</h2>
+        <h2>Administrador de Versiones</h2>
         <button className="create-version-btn" onClick={handleCreateVersion}>
-          Create New Version
+          Crear Nueva Versión
         </button>
       </div>
 
       {versions.length === 0 ? (
         <div className="empty-versions">
-          <h3>No versions found</h3>
-          <p>Create your first version to get started!</p>
+          <h3>No se encontraron versiones</h3>
+          <p>¡Crea tu primera versión para comenzar!</p>
           <button className="create-version-btn" onClick={handleCreateVersion}>
-            Create First Version
+            Crear Primera Versión
           </button>
         </div>
       ) : (
@@ -207,18 +207,18 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
                 </div>
 
                 <div className="version-meta">
-                  <span>By {version.created_by_username}</span>
+                  <span>Por {version.created_by_username}</span>
                   <span>{formatDate(version.created_at)}</span>
                 </div>
 
                 <div className="version-stats">
                   <div className="stat-item">
                     <span className="stat-number">{version.questions.length}</span>
-                    <span className="stat-label">Questions</span>
+                    <span className="stat-label">Preguntas</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-number">{version.is_active ? 'Active' : 'Inactive'}</span>
-                    <span className="stat-label">Status</span>
+                    <span className="stat-number">{version.is_active ? 'Activa' : 'Inactiva'}</span>
+                    <span className="stat-label">Estado</span>
                   </div>
                 </div>
 
@@ -228,7 +228,7 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
                     onClick={() => handleActivateVersion(version.id)}
                     disabled={version.is_active}
                   >
-                    {version.is_active ? 'Active' : 'Activate'}
+                    {version.is_active ? 'Activa' : 'Activar'}
                   </button>
                   <button 
                     className="version-btn compare-btn"
@@ -237,14 +237,14 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
                       setSelectedVersion2(null);
                     }}
                   >
-                    Select for Compare
+                    Seleccionar para Comparar
                   </button>
                   <button 
                     className="version-btn delete-version-btn"
                     onClick={() => handleDeleteVersion(version.id)}
                     disabled={version.is_active}
                   >
-                    Delete
+                    Eliminar
                   </button>
                 </div>
               </div>
@@ -253,15 +253,15 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
 
           {selectedVersion1 && (
             <div style={{ marginTop: '20px', padding: '20px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <h4>Compare Versions</h4>
-              <p>Selected version: v{versions.find(v => v.id === selectedVersion1)?.version_number}</p>
+              <h4>Comparar Versiones</h4>
+              <p>Versión seleccionada: v{versions.find(v => v.id === selectedVersion1)?.version_number}</p>
               <div style={{ marginTop: '10px' }}>
                 <select 
                   value={selectedVersion2 || ''} 
                   onChange={(e) => setSelectedVersion2(Number(e.target.value))}
                   style={{ marginRight: '10px', padding: '8px' }}
                 >
-                  <option value="">Select second version</option>
+                  <option value="">Selecciona segunda versión</option>
                   {versions
                     .filter(v => v.id !== selectedVersion1)
                     .map(version => (
@@ -276,7 +276,7 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
                   onClick={handleCompareVersions}
                   disabled={!selectedVersion2}
                 >
-                  Compare
+                  Comparar
                 </button>
               </div>
             </div>
@@ -288,7 +288,7 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
         <div className="compare-modal">
           <div className="compare-content">
             <div className="compare-header">
-              <h3>Version Comparison</h3>
+              <h3>Comparación de Versiones</h3>
               <button className="close-btn" onClick={() => setShowCompareModal(false)}>
                 ×
               </button>
@@ -298,30 +298,30 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
               <div className="version-summary">
                 <h4>{comparison.version1.title}</h4>
                 <span className="version-number">v{comparison.version1.version_number}</span>
-                <p>{comparison.version1.question_count} questions</p>
+                <p>{comparison.version1.question_count} preguntas</p>
               </div>
               <div className="version-summary">
                 <h4>{comparison.version2.title}</h4>
                 <span className="version-number">v{comparison.version2.version_number}</span>
-                <p>{comparison.version2.question_count} questions</p>
+                <p>{comparison.version2.question_count} preguntas</p>
               </div>
             </div>
 
             <div className="differences-section">
-              <h4>Changes</h4>
+              <h4>Cambios</h4>
               
               {comparison.differences.title_changed && (
                 <div className="difference-item">
-                  <h5>Title Changed</h5>
+                  <h5>Título Cambiado</h5>
                   <div className="difference-details">
-                    The form title has been modified between versions.
+                    El título del formulario ha sido modificado entre versiones.
                   </div>
                 </div>
               )}
 
               {comparison.differences.questions_added.length > 0 && (
                 <div className="difference-item">
-                  <h5>Questions Added ({comparison.differences.questions_added.length})</h5>
+                  <h5>Preguntas Agregadas ({comparison.differences.questions_added.length})</h5>
                   <ul className="changes-list">
                     {comparison.differences.questions_added.map((question, index) => (
                       <li key={index} className="change-added">
@@ -334,7 +334,7 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
 
               {comparison.differences.questions_removed.length > 0 && (
                 <div className="difference-item">
-                  <h5>Questions Removed ({comparison.differences.questions_removed.length})</h5>
+                  <h5>Preguntas Eliminadas ({comparison.differences.questions_removed.length})</h5>
                   <ul className="changes-list">
                     {comparison.differences.questions_removed.map((question, index) => (
                       <li key={index} className="change-removed">
@@ -347,13 +347,13 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
 
               {comparison.differences.questions_modified.length > 0 && (
                 <div className="difference-item">
-                  <h5>Questions Modified ({comparison.differences.questions_modified.length})</h5>
+                  <h5>Preguntas Modificadas ({comparison.differences.questions_modified.length})</h5>
                   {comparison.differences.questions_modified.map((question, index) => (
                     <div key={index} style={{ marginBottom: '10px' }}>
                       <strong className="change-modified">{question.question_text}</strong>
                       {Object.entries(question.changes).map(([changeType, change]) => (
                         <div key={changeType} style={{ marginLeft: '20px', fontSize: '12px' }}>
-                          <span className="change-modified">{changeType}:</span> {change.from} → {change.to}
+                          <span className="change-modified">{changeType}:</span> {(change as any).from} → {(change as any).to}
                         </div>
                       ))}
                     </div>
@@ -366,9 +366,9 @@ const VersionManager: React.FC<VersionManagerProps> = ({ formId }) => {
                comparison.differences.questions_removed.length === 0 &&
                comparison.differences.questions_modified.length === 0 && (
                 <div className="difference-item">
-                  <h5>No Changes</h5>
+                  <h5>Sin Cambios</h5>
                   <div className="difference-details">
-                    No differences found between the selected versions.
+                    No se encontraron diferencias entre las versiones seleccionadas.
                   </div>
                 </div>
               )}

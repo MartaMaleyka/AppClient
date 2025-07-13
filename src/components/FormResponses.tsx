@@ -46,7 +46,7 @@ const FormResponses: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch form details
+      // Obtener detalles del formulario
       const formResponse = await fetch(`http://localhost:5000/api/forms/${id}`);
       if (!formResponse.ok) {
         throw new Error('Formulario no encontrado');
@@ -54,7 +54,7 @@ const FormResponses: React.FC = () => {
       const formData = await formResponse.json();
       setForm(formData);
 
-      // Fetch responses
+      // Obtener respuestas
       const responsesResponse = await fetch(`http://localhost:5000/api/forms/${id}/responses`, {
         headers: {
           'Authorization': `Bearer ${token}`,

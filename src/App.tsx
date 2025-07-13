@@ -33,85 +33,51 @@ const AnalyticsDashboardWrapper: React.FC = () => {
 function AppContent() {
   const { login, isAuthenticated } = useAuth();
 
+  // Si no está autenticado, mostrar solo el login
+  if (!isAuthenticated) {
+    return (
+      <div className="App">
+        <Routes>
+          <Route path="*" element={<Login onLogin={login} />} />
+        </Routes>
+      </div>
+    );
+  }
+
+  // Si está autenticado, mostrar la aplicación completa
   return (
     <div className="App">
       <Navigation />
-      {isAuthenticated && <Breadcrumbs />}
+      <Breadcrumbs />
       <main className="container">
         <Routes>
-          <Route path="/login" element={<Login onLogin={login} />} />
-          
           {/* Rutas principales */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <FormList />
-            </ProtectedRoute>
-          } />
-          <Route path="/create" element={
-            <ProtectedRoute>
-              <FormBuilder />
-            </ProtectedRoute>
-          } />
+          <Route path="/" element={<FormList />} />
+          <Route path="/create" element={<FormBuilder />} />
           <Route path="/form/:id" element={<FormView />} />
-          <Route path="/form/:id/responses" element={
-            <ProtectedRoute>
-              <FormResponses />
-            </ProtectedRoute>
-          } />
+          <Route path="/form/:id/responses" element={<FormResponses />} />
           
           {/* Nuevas rutas para plantillas */}
-          <Route path="/templates" element={
-            <ProtectedRoute>
-              <TemplateManager />
-            </ProtectedRoute>
-          } />
+          <Route path="/templates" element={<TemplateManager />} />
           
           {/* Nuevas rutas para versionado */}
-          <Route path="/form/:formId/versions" element={
-            <ProtectedRoute>
-              <VersionManagerWrapper />
-            </ProtectedRoute>
-          } />
+          <Route path="/form/:formId/versions" element={<VersionManagerWrapper />} />
           
           {/* Nuevas rutas para notificaciones */}
-          <Route path="/notifications" element={
-            <ProtectedRoute>
-              <NotificationCenter />
-            </ProtectedRoute>
-          } />
+          <Route path="/notifications" element={<NotificationCenter />} />
           
           {/* Nuevas rutas para analytics */}
-          <Route path="/analytics" element={
-            <ProtectedRoute>
-              <AnalyticsDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/analytics/form/:formId" element={
-            <ProtectedRoute>
-              <AnalyticsDashboardWrapper />
-            </ProtectedRoute>
-          } />
+          <Route path="/analytics" element={<AnalyticsDashboard />} />
+          <Route path="/analytics/form/:formId" element={<AnalyticsDashboardWrapper />} />
           
           {/* Nuevas rutas para auditoría */}
-          <Route path="/audit-logs" element={
-            <ProtectedRoute>
-              <AuditLogViewer />
-            </ProtectedRoute>
-          } />
+          <Route path="/audit-logs" element={<AuditLogViewer />} />
           
           {/* Nuevas rutas para validaciones */}
-          <Route path="/validations" element={
-            <ProtectedRoute>
-              <ValidationBuilder />
-            </ProtectedRoute>
-          } />
+          <Route path="/validations" element={<ValidationBuilder />} />
           
           {/* Nuevas rutas para archivos */}
-          <Route path="/files" element={
-            <ProtectedRoute>
-              <FileManager />
-            </ProtectedRoute>
-          } />
+          <Route path="/files" element={<FileManager />} />
         </Routes>
       </main>
     </div>

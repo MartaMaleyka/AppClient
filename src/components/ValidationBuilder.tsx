@@ -47,7 +47,7 @@ const ValidationBuilder: React.FC = () => {
   const fetchValidations = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/validations', {
+      const response = await fetch('http://localhost:5000/api/validations', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -111,19 +111,19 @@ const ValidationBuilder: React.FC = () => {
       if (response.ok) {
         setShowModal(false);
         fetchValidations();
-        alert(editingValidation ? 'Validation updated successfully!' : 'Validation created successfully!');
+        alert(editingValidation ? '¡Validación actualizada exitosamente!' : '¡Validación creada exitosamente!');
       } else {
         const error = await response.json();
         alert(`Error: ${error.message}`);
       }
     } catch (error) {
       console.error('Error saving validation:', error);
-      alert('Error saving validation');
+      alert('Error al guardar la validación');
     }
   };
 
   const handleDeleteValidation = async (validationId: number) => {
-    if (!window.confirm('Are you sure you want to delete this validation?')) {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta validación?')) {
       return;
     }
 
@@ -137,13 +137,13 @@ const ValidationBuilder: React.FC = () => {
 
       if (response.ok) {
         fetchValidations();
-        alert('Validation deleted successfully!');
+        alert('¡Validación eliminada exitosamente!');
       } else {
-        alert('Error deleting validation');
+        alert('Error al eliminar la validación');
       }
     } catch (error) {
       console.error('Error deleting validation:', error);
-      alert('Error deleting validation');
+      alert('Error al eliminar la validación');
     }
   };
 
@@ -156,12 +156,12 @@ const ValidationBuilder: React.FC = () => {
 
   const handleRunTest = async () => {
     if (!testValidation || !testValue.trim()) {
-      alert('Please enter a test value');
+      alert('Por favor ingresa un valor de prueba');
       return;
     }
 
     try {
-      const response = await fetch('/api/validations/test', {
+      const response = await fetch('http://localhost:5000/api/validations/test', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -177,23 +177,23 @@ const ValidationBuilder: React.FC = () => {
         const result = await response.json();
         setTestResult(result);
       } else {
-        setTestResult({ success: false, message: 'Error testing validation' });
+        setTestResult({ success: false, message: 'Error al probar la validación' });
       }
     } catch (error) {
       console.error('Error testing validation:', error);
-      setTestResult({ success: false, message: 'Error testing validation' });
+      setTestResult({ success: false, message: 'Error al probar la validación' });
     }
   };
 
   const getValidationTypeLabel = (type: string) => {
     switch (type) {
-      case 'regex': return 'Regular Expression';
-      case 'length': return 'Length Check';
-      case 'range': return 'Range Check';
-      case 'custom': return 'Custom Function';
-      case 'email': return 'Email Validation';
-      case 'url': return 'URL Validation';
-      case 'phone': return 'Phone Number';
+      case 'regex': return 'Expresión Regular';
+      case 'length': return 'Verificación de Longitud';
+      case 'range': return 'Verificación de Rango';
+      case 'custom': return 'Función Personalizada';
+      case 'email': return 'Validación de Email';
+      case 'url': return 'Validación de URL';
+      case 'phone': return 'Número de Teléfono';
       default: return type;
     }
   };
@@ -204,7 +204,7 @@ const ValidationBuilder: React.FC = () => {
         return (
           <div className="validation-params">
             <div className="param-group">
-              <label>Regular Expression Pattern</label>
+              <label>Patrón de Expresión Regular</label>
               <input
                 type="text"
                 value={formData.parameters.pattern || ''}
@@ -212,11 +212,11 @@ const ValidationBuilder: React.FC = () => {
                   ...formData,
                   parameters: { ...formData.parameters, pattern: e.target.value }
                 })}
-                placeholder="Enter regex pattern"
+                placeholder="Ingresa el patrón regex"
               />
             </div>
             <div className="param-group">
-              <label>Flags (optional)</label>
+              <label>Banderas (opcional)</label>
               <input
                 type="text"
                 value={formData.parameters.flags || ''}
@@ -224,7 +224,7 @@ const ValidationBuilder: React.FC = () => {
                   ...formData,
                   parameters: { ...formData.parameters, flags: e.target.value }
                 })}
-                placeholder="e.g., gi, m"
+                placeholder="ej: gi, m"
               />
             </div>
           </div>
@@ -234,7 +234,7 @@ const ValidationBuilder: React.FC = () => {
         return (
           <div className="validation-params">
             <div className="param-group">
-              <label>Minimum Length</label>
+              <label>Longitud Mínima</label>
               <input
                 type="number"
                 value={formData.parameters.min_length || ''}
@@ -242,11 +242,11 @@ const ValidationBuilder: React.FC = () => {
                   ...formData,
                   parameters: { ...formData.parameters, min_length: parseInt(e.target.value) }
                 })}
-                placeholder="Minimum length"
+                placeholder="Longitud mínima"
               />
             </div>
             <div className="param-group">
-              <label>Maximum Length</label>
+              <label>Longitud Máxima</label>
               <input
                 type="number"
                 value={formData.parameters.max_length || ''}
@@ -254,7 +254,7 @@ const ValidationBuilder: React.FC = () => {
                   ...formData,
                   parameters: { ...formData.parameters, max_length: parseInt(e.target.value) }
                 })}
-                placeholder="Maximum length"
+                placeholder="Longitud máxima"
               />
             </div>
           </div>
@@ -264,7 +264,7 @@ const ValidationBuilder: React.FC = () => {
         return (
           <div className="validation-params">
             <div className="param-group">
-              <label>Minimum Value</label>
+              <label>Valor Mínimo</label>
               <input
                 type="number"
                 value={formData.parameters.min_value || ''}
@@ -272,11 +272,11 @@ const ValidationBuilder: React.FC = () => {
                   ...formData,
                   parameters: { ...formData.parameters, min_value: parseFloat(e.target.value) }
                 })}
-                placeholder="Minimum value"
+                placeholder="Valor mínimo"
               />
             </div>
             <div className="param-group">
-              <label>Maximum Value</label>
+              <label>Valor Máximo</label>
               <input
                 type="number"
                 value={formData.parameters.max_value || ''}
@@ -284,7 +284,7 @@ const ValidationBuilder: React.FC = () => {
                   ...formData,
                   parameters: { ...formData.parameters, max_value: parseFloat(e.target.value) }
                 })}
-                placeholder="Maximum value"
+                placeholder="Valor máximo"
               />
             </div>
           </div>
@@ -294,14 +294,14 @@ const ValidationBuilder: React.FC = () => {
         return (
           <div className="validation-params">
             <div className="param-group">
-              <label>Custom Function (JavaScript)</label>
+              <label>Función Personalizada (JavaScript)</label>
               <textarea
                 value={formData.parameters.function || ''}
                 onChange={(e) => setFormData({
                   ...formData,
                   parameters: { ...formData.parameters, function: e.target.value }
                 })}
-                placeholder="function(value) { return value.length > 0; }"
+                placeholder="función(value) { return value.length > 0; }"
                 rows={4}
               />
             </div>
@@ -328,18 +328,18 @@ const ValidationBuilder: React.FC = () => {
   return (
     <div className="validation-builder">
       <div className="validation-header">
-        <h2>Validation Builder</h2>
+        <h2>Constructor de Validaciones</h2>
         <button className="add-validation-btn" onClick={handleCreateValidation}>
-          Add Validation
+          Agregar Validación
         </button>
       </div>
 
       {validations.length === 0 ? (
         <div className="empty-validations">
-          <h3>No validations found</h3>
-          <p>Create your first validation rule to get started!</p>
+          <h3>No se encontraron validaciones</h3>
+          <p>¡Crea tu primera regla de validación para empezar!</p>
           <button className="add-validation-btn" onClick={handleCreateValidation}>
-            Create First Validation
+            Crear Primera Validación
           </button>
         </div>
       ) : (
@@ -366,19 +366,19 @@ const ValidationBuilder: React.FC = () => {
                   className="validation-btn test-validation-btn"
                   onClick={() => handleTestValidation(validation)}
                 >
-                  Test
+                  Probar
                 </button>
                 <button 
                   className="validation-btn edit-validation-btn"
                   onClick={() => handleEditValidation(validation)}
                 >
-                  Edit
+                  Editar
                 </button>
                 <button 
                   className="validation-btn delete-validation-btn"
                   onClick={() => handleDeleteValidation(validation.id)}
                 >
-                  Delete
+                  Eliminar
                 </button>
               </div>
             </div>
@@ -390,56 +390,56 @@ const ValidationBuilder: React.FC = () => {
         <div className="validation-modal">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>{editingValidation ? 'Edit Validation' : 'Create Validation'}</h3>
+              <h3>{editingValidation ? 'Editar Validación' : 'Crear Validación'}</h3>
               <button className="close-btn" onClick={() => setShowModal(false)}>
                 ×
               </button>
             </div>
 
             <div className="form-group">
-              <label>Validation Name</label>
+              <label>Nombre de la Validación</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="Enter validation name"
+                placeholder="Ingresa el nombre de la validación"
               />
             </div>
 
             <div className="form-group">
-              <label>Description</label>
+              <label>Descripción</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Enter validation description"
+                placeholder="Ingresa la descripción de la validación"
               />
             </div>
 
             <div className="form-group">
-              <label>Validation Type</label>
+              <label>Tipo de Validación</label>
               <select
                 value={formData.validation_type}
                 onChange={(e) => setFormData({...formData, validation_type: e.target.value})}
               >
-                <option value="regex">Regular Expression</option>
-                <option value="length">Length Check</option>
-                <option value="range">Range Check</option>
-                <option value="custom">Custom Function</option>
-                <option value="email">Email Validation</option>
-                <option value="url">URL Validation</option>
-                <option value="phone">Phone Number</option>
+                <option value="regex">Expresión Regular</option>
+                <option value="length">Verificación de Longitud</option>
+                <option value="range">Verificación de Rango</option>
+                <option value="custom">Función Personalizada</option>
+                <option value="email">Validación de Email</option>
+                <option value="url">Validación de URL</option>
+                <option value="phone">Número de Teléfono</option>
               </select>
             </div>
 
             {getParameterFields()}
 
             <div className="form-group">
-              <label>Error Message</label>
+              <label>Mensaje de Error</label>
               <input
                 type="text"
                 value={formData.error_message}
                 onChange={(e) => setFormData({...formData, error_message: e.target.value})}
-                placeholder="Enter error message"
+                placeholder="Ingresa el mensaje de error"
               />
             </div>
 
@@ -450,16 +450,16 @@ const ValidationBuilder: React.FC = () => {
                   checked={formData.is_active}
                   onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
                 />
-                Active
+                Activa
               </label>
             </div>
 
             <div className="modal-actions">
               <button className="modal-btn cancel-btn" onClick={() => setShowModal(false)}>
-                Cancel
+                Cancelar
               </button>
               <button className="modal-btn save-btn" onClick={handleSaveValidation}>
-                {editingValidation ? 'Update Validation' : 'Create Validation'}
+                {editingValidation ? 'Actualizar Validación' : 'Crear Validación'}
               </button>
             </div>
           </div>
@@ -470,29 +470,29 @@ const ValidationBuilder: React.FC = () => {
         <div className="test-modal">
           <div className="test-content">
             <div className="test-header">
-              <h3>Test Validation: {testValidation.name}</h3>
+              <h3>Probar Validación: {testValidation.name}</h3>
               <button className="close-btn" onClick={() => setShowTestModal(false)}>
                 ×
               </button>
             </div>
 
             <div className="form-group">
-              <label>Test Value</label>
+              <label>Valor de Prueba</label>
               <input
                 type="text"
                 value={testValue}
                 onChange={(e) => setTestValue(e.target.value)}
-                placeholder="Enter value to test"
+                placeholder="Ingresa el valor a probar"
               />
             </div>
 
             <button className="modal-btn save-btn" onClick={handleRunTest}>
-              Run Test
+              Ejecutar Prueba
             </button>
 
             {testResult && (
               <div className={`test-result ${testResult.success ? 'success' : 'error'}`}>
-                {testResult.success ? '✓ Validation passed' : '✗ Validation failed'}
+                {testResult.success ? '✓ Validación exitosa' : '✗ Validación falló'}
                 <br />
                 {testResult.message}
               </div>

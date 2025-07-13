@@ -44,7 +44,7 @@ const TemplateManager: React.FC = () => {
   const fetchTemplates = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/templates/public');
+      const response = await fetch('http://localhost:5000/api/templates/public');
       if (response.ok) {
         const data = await response.json();
         setTemplates(data);
@@ -60,7 +60,7 @@ const TemplateManager: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/templates/categories');
+      const response = await fetch('http://localhost:5000/api/templates/categories');
       if (response.ok) {
         const data = await response.json();
         setCategories(data);
@@ -114,19 +114,19 @@ const TemplateManager: React.FC = () => {
       if (response.ok) {
         setShowModal(false);
         fetchTemplates();
-        alert(editingTemplate ? 'Template updated successfully!' : 'Template created successfully!');
+        alert(editingTemplate ? 'Plantilla actualizada exitosamente!' : 'Plantilla creada exitosamente!');
       } else {
         const error = await response.json();
         alert(`Error: ${error.message}`);
       }
     } catch (error) {
       console.error('Error saving template:', error);
-      alert('Error saving template');
+      alert('Error al guardar plantilla');
     }
   };
 
   const handleDeleteTemplate = async (templateId: number) => {
-    if (!window.confirm('Are you sure you want to delete this template?')) {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta plantilla?')) {
       return;
     }
 
@@ -140,19 +140,19 @@ const TemplateManager: React.FC = () => {
 
       if (response.ok) {
         fetchTemplates();
-        alert('Template deleted successfully!');
+        alert('Plantilla eliminada exitosamente!');
       } else {
-        alert('Error deleting template');
+        alert('Error al eliminar plantilla');
       }
     } catch (error) {
       console.error('Error deleting template:', error);
-      alert('Error deleting template');
+      alert('Error al eliminar plantilla');
     }
   };
 
   const handleUseTemplate = async (template: Template) => {
     try {
-      const response = await fetch('/api/forms/from-template', {
+      const response = await fetch('http://localhost:5000/api/forms/from-template', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,23 +161,23 @@ const TemplateManager: React.FC = () => {
         body: JSON.stringify({
           template_id: template.id,
           form_data: {
-            title: `Form from ${template.name}`,
-            description: `Created from template: ${template.name}`
+            title: `Formulario desde ${template.name}`,
+            description: `Creado desde plantilla: ${template.name}`
           }
         })
       });
 
       if (response.ok) {
         const result = await response.json();
-        alert('Form created successfully!');
+        alert('¡Formulario creado exitosamente!');
         // Redirect to form builder or form list
         window.location.href = `/forms/${result.id}`;
       } else {
-        alert('Error creating form from template');
+        alert('Error al crear formulario desde plantilla');
       }
     } catch (error) {
       console.error('Error using template:', error);
-      alert('Error using template');
+      alert('Error al usar plantilla');
     }
   };
 
@@ -203,20 +203,20 @@ const TemplateManager: React.FC = () => {
   return (
     <div className="template-manager">
       <div className="template-header">
-        <h2>Template Manager</h2>
+        <h2>Administrador de Plantillas</h2>
         <button className="create-template-btn" onClick={handleCreateTemplate}>
-          Create Template
+          Crear Plantilla
         </button>
       </div>
 
       <div className="template-filters">
         <div className="filter-group">
-          <label>Category</label>
+          <label>Categoría</label>
           <select 
             value={selectedCategory} 
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            <option value="all">All Categories</option>
+            <option value="all">Todas las Categorías</option>
             {categories.map(category => (
               <option key={category} value={category}>{category}</option>
             ))}
@@ -224,10 +224,10 @@ const TemplateManager: React.FC = () => {
         </div>
 
         <div className="filter-group">
-          <label>Search</label>
+          <label>Buscar</label>
           <input
             type="text"
-            placeholder="Search templates..."
+            placeholder="Buscar plantillas..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -236,16 +236,16 @@ const TemplateManager: React.FC = () => {
 
       {filteredTemplates.length === 0 ? (
         <div className="empty-state">
-          <h3>No templates found</h3>
+          <h3>No se encontraron plantillas</h3>
           <p>
             {searchTerm || selectedCategory !== 'all' 
-              ? 'Try adjusting your search criteria or filters.'
-              : 'Create your first template to get started!'
+              ? 'Intenta ajustar tus criterios de búsqueda o filtros.'
+              : '¡Crea tu primera plantilla para comenzar!'
             }
           </p>
           {!searchTerm && selectedCategory === 'all' && (
             <button className="create-template-btn" onClick={handleCreateTemplate}>
-              Create Your First Template
+              Crear Tu Primera Plantilla
             </button>
           )}
         </div>
@@ -258,18 +258,18 @@ const TemplateManager: React.FC = () => {
               <p className="description">{template.description}</p>
               
               <div className="meta">
-                <span>By {template.created_by_username}</span>
+                <span>Por {template.created_by_username}</span>
                 <span>{formatDate(template.created_at)}</span>
               </div>
 
               <div className="stats">
                 <div className="stat-item">
                   <span className="stat-number">{template.questions.length}</span>
-                  <span className="stat-label">Questions</span>
+                  <span className="stat-label">Preguntas</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-number">{template.is_public ? 'Public' : 'Private'}</span>
-                  <span className="stat-label">Visibility</span>
+                  <span className="stat-number">{template.is_public ? 'Pública' : 'Privada'}</span>
+                  <span className="stat-label">Visibilidad</span>
                 </div>
               </div>
 
@@ -278,19 +278,19 @@ const TemplateManager: React.FC = () => {
                   className="template-btn use-template-btn"
                   onClick={() => handleUseTemplate(template)}
                 >
-                  Use Template
+                  Usar Plantilla
                 </button>
                 <button 
                   className="template-btn edit-template-btn"
                   onClick={() => handleEditTemplate(template)}
                 >
-                  Edit
+                  Editar
                 </button>
                 <button 
                   className="template-btn delete-template-btn"
                   onClick={() => handleDeleteTemplate(template.id)}
                 >
-                  Delete
+                  Eliminar
                 </button>
               </div>
             </div>
@@ -302,38 +302,38 @@ const TemplateManager: React.FC = () => {
         <div className="template-modal">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>{editingTemplate ? 'Edit Template' : 'Create Template'}</h3>
+              <h3>{editingTemplate ? 'Editar Plantilla' : 'Crear Plantilla'}</h3>
               <button className="close-btn" onClick={() => setShowModal(false)}>
                 ×
               </button>
             </div>
 
             <div className="form-group">
-              <label>Template Name</label>
+              <label>Nombre de la Plantilla</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="Enter template name"
+                placeholder="Ingresa el nombre de la plantilla"
               />
             </div>
 
             <div className="form-group">
-              <label>Description</label>
+              <label>Descripción</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Enter template description"
+                placeholder="Ingresa la descripción de la plantilla"
               />
             </div>
 
             <div className="form-group">
-              <label>Category</label>
+              <label>Categoría</label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
               >
-                <option value="">Select a category</option>
+                <option value="">Selecciona una categoría</option>
                 {categories.map(category => (
                   <option key={category} value={category}>{category}</option>
                 ))}
@@ -348,16 +348,16 @@ const TemplateManager: React.FC = () => {
                   checked={formData.is_public}
                   onChange={(e) => setFormData({...formData, is_public: e.target.checked})}
                 />
-                <label htmlFor="is_public">Make this template public</label>
+                <label htmlFor="is_public">Plantilla pública</label>
               </div>
             </div>
 
             <div className="modal-actions">
-              <button className="modal-btn cancel-btn" onClick={() => setShowModal(false)}>
-                Cancel
+              <button className="cancel-btn" onClick={() => setShowModal(false)}>
+                Cancelar
               </button>
-              <button className="modal-btn save-btn" onClick={handleSaveTemplate}>
-                {editingTemplate ? 'Update Template' : 'Create Template'}
+              <button className="save-btn" onClick={handleSaveTemplate}>
+                {editingTemplate ? 'Actualizar' : 'Crear'}
               </button>
             </div>
           </div>

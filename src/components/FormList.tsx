@@ -45,9 +45,6 @@ const FormList: React.FC = () => {
     }
 
     try {
-      console.log('Attempting to delete form:', formId);
-      console.log('Token:', token);
-      
       const response = await fetch(`http://localhost:5000/api/forms/${formId}`, {
         method: 'DELETE',
         headers: {
@@ -56,22 +53,16 @@ const FormList: React.FC = () => {
         },
       });
       
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-      
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('Error response:', errorData);
         throw new Error(`Error al eliminar formulario: ${response.status} - ${errorData}`);
       }
       
       const result = await response.json();
-      console.log('Delete successful:', result);
       
-      // Remove the form from the local state
+      // Remover el formulario del estado local
       setForms(forms.filter(form => form.id !== formId));
     } catch (err) {
-      console.error('Delete error:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
     }
   };

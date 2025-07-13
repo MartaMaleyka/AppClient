@@ -45,7 +45,7 @@ const FileManager: React.FC = () => {
   const fetchFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/files', {
+      const response = await fetch('http://localhost:5000/api/files', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -65,7 +65,7 @@ const FileManager: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/files/stats', {
+      const response = await fetch('http://localhost:5000/api/files/stats', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -106,18 +106,18 @@ const FileManager: React.FC = () => {
           setUploadProgress(0);
           fetchFiles();
           fetchStats();
-          alert('Files uploaded successfully!');
+          alert('¡Archivos subidos exitosamente!');
         } else {
           setUploading(false);
           setUploadProgress(0);
-          alert('Error uploading files');
+          alert('Error al subir archivos');
         }
       });
 
       xhr.addEventListener('error', () => {
         setUploading(false);
         setUploadProgress(0);
-        alert('Error uploading files');
+        alert('Error al subir archivos');
       });
 
       xhr.open('POST', '/api/files/upload');
@@ -127,7 +127,7 @@ const FileManager: React.FC = () => {
       console.error('Error uploading files:', error);
       setUploading(false);
       setUploadProgress(0);
-      alert('Error uploading files');
+      alert('Error al subir archivos');
     }
   };
 
@@ -150,16 +150,16 @@ const FileManager: React.FC = () => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       } else {
-        alert('Error downloading file');
+        alert('Error al descargar archivo');
       }
     } catch (error) {
       console.error('Error downloading file:', error);
-      alert('Error downloading file');
+      alert('Error al descargar archivo');
     }
   };
 
   const handleDeleteFile = async (fileId: number) => {
-    if (!window.confirm('Are you sure you want to delete this file?')) {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este archivo?')) {
       return;
     }
 
@@ -174,13 +174,13 @@ const FileManager: React.FC = () => {
       if (response.ok) {
         fetchFiles();
         fetchStats();
-        alert('File deleted successfully!');
+        alert('¡Archivo eliminado exitosamente!');
       } else {
-        alert('Error deleting file');
+        alert('Error al eliminar archivo');
       }
     } catch (error) {
       console.error('Error deleting file:', error);
-      alert('Error deleting file');
+      alert('Error al eliminar archivo');
     }
   };
 
@@ -256,9 +256,9 @@ const FileManager: React.FC = () => {
   return (
     <div className="file-manager">
       <div className="file-header">
-        <h2>File Manager</h2>
+        <h2>Gestor de Archivos</h2>
         <button className="upload-btn" onClick={() => fileInputRef.current?.click()}>
-          Upload Files
+          Subir Archivos
         </button>
       </div>
 
@@ -266,19 +266,19 @@ const FileManager: React.FC = () => {
         <div className="file-stats">
           <div className="stat-item">
             <span className="stat-number">{stats.total_files}</span>
-            <span className="stat-label">Total Files</span>
+            <span className="stat-label">Total de Archivos</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{formatFileSize(stats.total_size)}</span>
-            <span className="stat-label">Total Size</span>
+            <span className="stat-label">Tamaño Total</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.image_files}</span>
-            <span className="stat-label">Images</span>
+            <span className="stat-label">Imágenes</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.document_files}</span>
-            <span className="stat-label">Documents</span>
+            <span className="stat-label">Documentos</span>
           </div>
           <div className="stat-item">
             <span className="stat-number">{stats.video_files}</span>
@@ -293,26 +293,26 @@ const FileManager: React.FC = () => {
 
       <div className="file-filters">
         <div className="filter-group">
-          <label>File Type</label>
+                        <label>Tipo de Archivo</label>
           <select 
             value={selectedFileType} 
             onChange={(e) => setSelectedFileType(e.target.value)}
           >
-            <option value="all">All Types</option>
-            <option value="image">Images</option>
-            <option value="document">Documents</option>
+            <option value="all">Todos los Tipos</option>
+            <option value="image">Imágenes</option>
+            <option value="document">Documentos</option>
             <option value="video">Videos</option>
             <option value="audio">Audio</option>
-            <option value="archive">Archives</option>
-            <option value="other">Other</option>
+            <option value="archive">Archivos</option>
+            <option value="other">Otros</option>
           </select>
         </div>
 
         <div className="filter-group">
-          <label>Search</label>
+                        <label>Buscar</label>
           <input
             type="text"
-            placeholder="Search files..."
+                          placeholder="Buscar archivos..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -325,8 +325,8 @@ const FileManager: React.FC = () => {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <h3>Drag & Drop Files Here</h3>
-        <p>or click the upload button above</p>
+        <h3>Arrastra y Suelta Archivos Aquí</h3>
+        <p>o haz clic en el botón de subir arriba</p>
         <input
           ref={fileInputRef}
           type="file"
@@ -343,23 +343,23 @@ const FileManager: React.FC = () => {
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
-            <div className="progress-text">{Math.round(uploadProgress)}% uploaded</div>
+            <div className="progress-text">{Math.round(uploadProgress)}% subido</div>
           </div>
         )}
       </div>
 
       {filteredFiles.length === 0 ? (
         <div className="empty-files">
-          <h3>No files found</h3>
+          <h3>No se encontraron archivos</h3>
           <p>
             {searchTerm || selectedFileType !== 'all' 
-              ? 'Try adjusting your search criteria or filters.'
-              : 'Upload your first file to get started!'
+              ? 'Intenta ajustar tus criterios de búsqueda o filtros.'
+              : '¡Sube tu primer archivo para empezar!'
             }
           </p>
           {!searchTerm && selectedFileType === 'all' && (
             <button className="upload-btn" onClick={() => fileInputRef.current?.click()}>
-              Upload Your First File
+              Sube tu Primer Archivo
             </button>
           )}
         </div>
@@ -378,7 +378,7 @@ const FileManager: React.FC = () => {
                   <span className="file-type">{getFileType(file.mime_type)}</span>
                 </div>
                 <div style={{ fontSize: '11px', color: '#888', marginBottom: '15px' }}>
-                  Uploaded by {file.uploaded_by_username} on {formatDate(file.upload_date)}
+                  Subido por {file.uploaded_by_username} el {formatDate(file.upload_date)}
                 </div>
               </div>
 
@@ -387,19 +387,19 @@ const FileManager: React.FC = () => {
                   className="file-btn download-btn"
                   onClick={() => handleDownload(file)}
                 >
-                  Download
+                  Descargar
                 </button>
                 <button 
                   className="file-btn preview-btn"
                   onClick={() => handlePreviewFile(file)}
                 >
-                  Preview
+                  Vista Previa
                 </button>
                 <button 
                   className="file-btn delete-file-btn"
                   onClick={() => handleDeleteFile(file.id)}
                 >
-                  Delete
+                  Eliminar
                 </button>
               </div>
             </div>
@@ -427,23 +427,23 @@ const FileManager: React.FC = () => {
 
             <div className="preview-details">
               <div className="detail-item">
-                <span className="detail-label">File Name:</span>
+                <span className="detail-label">Nombre del Archivo:</span>
                 <span className="detail-value">{previewFile.original_filename}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">File Size:</span>
+                <span className="detail-label">Tamaño del Archivo:</span>
                 <span className="detail-value">{formatFileSize(previewFile.file_size)}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">File Type:</span>
+                <span className="detail-label">Tipo de Archivo:</span>
                 <span className="detail-value">{previewFile.mime_type}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Upload Date:</span>
+                <span className="detail-label">Fecha de Subida:</span>
                 <span className="detail-value">{formatDate(previewFile.upload_date)}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Uploaded By:</span>
+                <span className="detail-label">Subido Por:</span>
                 <span className="detail-value">{previewFile.uploaded_by_username}</span>
               </div>
             </div>
@@ -453,7 +453,7 @@ const FileManager: React.FC = () => {
                 className="file-btn download-btn"
                 onClick={() => handleDownload(previewFile)}
               >
-                Download
+                Descargar
               </button>
               <button 
                 className="file-btn delete-file-btn"
@@ -462,7 +462,7 @@ const FileManager: React.FC = () => {
                   setShowPreviewModal(false);
                 }}
               >
-                Delete
+                Eliminar
               </button>
             </div>
           </div>
