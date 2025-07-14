@@ -73,9 +73,9 @@ const Navigation: React.FC = () => {
             🔔 Notificaciones
             <NotificationBadge className="nav-badge" />
           </Link>
-          <Link to="/validations" className={`nav-link ${isActive('/validations') ? 'active' : ''}`}>
+          {/* <Link to="/validations" className={`nav-link ${isActive('/validations') ? 'active' : ''}`}>
             ✅ Validaciones
-          </Link>
+          </Link> */}
           <Link to="/files" className={`nav-link ${isActive('/files') ? 'active' : ''}`}>
             📁 Archivos
           </Link>

@@ -15,7 +15,7 @@ import VersionManager from './components/VersionManager.tsx';
 import NotificationCenter from './components/NotificationCenter.tsx';
 import AnalyticsDashboard from './components/AnalyticsDashboard.tsx';
 import AuditLogViewer from './components/AuditLogViewer.tsx';
-import ValidationBuilder from './components/ValidationBuilder.tsx';
+// import ValidationBuilder from './components/ValidationBuilder.tsx';
 import FileManager from './components/FileManager.tsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.js';
 
@@ -74,8 +74,8 @@ function AppContent() {
           {/* Nuevas rutas para auditoría */}
           <Route path="/audit-logs" element={<AuditLogViewer />} />
           
-          {/* Nuevas rutas para validaciones */}
-          <Route path="/validations" element={<ValidationBuilder />} />
+          {/* Nuevas rutas para validaciones - DISABLED */}
+          {/* <Route path="/validations" element={<ValidationBuilder />} /> */}
           
           {/* Nuevas rutas para archivos */}
           <Route path="/files" element={<FileManager />} />

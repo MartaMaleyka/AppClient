@@ -568,4 +568,98 @@
 
 .validations-help strong {
   color: #664d03;
+}
+
+/* Estilos para validaciones globales */
+.global-validations-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+}
+
+.global-validations-header {
+  margin-bottom: 1rem;
+}
+
+.global-validations-header h4 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.global-validations-header p {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.global-validations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.global-validation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.global-validation-item:hover {
+  border-color: #1e88e5;
+  box-shadow: 0 2px 4px rgba(30, 136, 229, 0.1);
+}
+
+.validation-info {
+  flex: 1;
+}
+
+.validation-info strong {
+  display: block;
+  color: #333;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.validation-type {
+  display: inline-block;
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.validation-description {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.add-global-validation-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.add-global-validation-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
 } 

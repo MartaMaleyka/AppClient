@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './FormBuilder.css';
+
+interface GlobalValidation {
+  id: number;
+  name: string;
+  description: string;
+  validation_type: string;
+  validation_rule: string;
+  error_message: string;
+}
 
 interface Question {
   id: number;
   question_text: string;
-  question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'date' | 'time' | 'datetime-local' | 'email' | 'number';
+  question_type: 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'date' | 'time' | 'datetime-local' | 'file' | 'rating' | 'scale';
   options: string[];
   required: boolean;
   skip_logic?: {
@@ -15,15 +24,7 @@ interface Question {
       skip_to_question: number;
     }[];
   };
-  validations?: {
-    enabled: boolean;
-    rules: {
-      validation_id?: number;
-      validation_type: string;
-      validation_rule: string;
-      error_message: string;
-    }[];
-  };
+
 }
 
 const FormBuilder: React.FC = () => {
@@ -33,6 +34,7 @@ const FormBuilder: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [globalValidations, setGlobalValidations] = useState<GlobalValidation[]>([]);
 
   const addQuestion = () => {
     const newQuestion: Question = {
@@ -138,65 +140,7 @@ const FormBuilder: React.FC = () => {
     }
   };
 
-  // Funciones para validaciones
-  const toggleValidations = (questionIndex: number) => {
-    const updatedQuestions = [...questions];
-    const question = updatedQuestions[questionIndex];
-    
-    if (!question.validations) {
-      question.validations = {
-        enabled: true,
-        rules: []
-      };
-    } else {
-      question.validations.enabled = !question.validations.enabled;
-    }
-    
-    setQuestions(updatedQuestions);
-  };
 
-  const addValidationRule = (questionIndex: number) => {
-    const updatedQuestions = [...questions];
-    const question = updatedQuestions[questionIndex];
-    
-    if (!question.validations) {
-      question.validations = {
-        enabled: true,
-        rules: []
-      };
-    }
-    
-    question.validations.rules.push({
-      validation_type: 'regex',
-      validation_rule: '',
-      error_message: ''
-    });
-    
-    setQuestions(updatedQuestions);
-  };
-
-  const updateValidationRule = (questionIndex: number, ruleIndex: number, field: string, value: string) => {
-    const updatedQuestions = [...questions];
-    const question = updatedQuestions[questionIndex];
-    
-    if (question.validations && question.validations.rules[ruleIndex]) {
-      question.validations.rules[ruleIndex] = {
-        ...question.validations.rules[ruleIndex],
-        [field]: value
-      };
-      setQuestions(updatedQuestions);
-    }
-  };
-
-  const removeValidationRule = (questionIndex: number, ruleIndex: number) => {
-    const updatedQuestions = [...questions];
-    const question = updatedQuestions[questionIndex];
-    
-    if (question.validations) {
-      question.validations.rules.splice(ruleIndex, 1);
-      setQuestions(updatedQuestions);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -355,14 +299,15 @@ const FormBuilder: React.FC = () => {
                         >
                           <option value="text">Texto</option>
                           <option value="textarea">Área de texto</option>
-                          <option value="email">Email</option>
-                          <option value="number">Número</option>
-                          <option value="date">Fecha</option>
-                          <option value="time">Hora</option>
-                          <option value="datetime-local">Fecha y hora</option>
                           <option value="radio">Opción única</option>
                           <option value="checkbox">Múltiples opciones</option>
                           <option value="select">Lista desplegable</option>
+                          <option value="date">Fecha</option>
+                          <option value="time">Hora</option>
+                          <option value="datetime-local">Fecha y hora</option>
+                          <option value="file">Archivo</option>
+                          <option value="rating">Calificación</option>
+                          <option value="scale">Escala</option>
                         </select>
                       </div>
 
@@ -497,106 +442,7 @@ const FormBuilder: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Validations Section */}
-                    <div className="validations-section">
-                      <div className="validations-header">
-                        <label className="checkbox-label">
-                          <input
-                            type="checkbox"
-                            checked={question.validations?.enabled || false}
-                            onChange={() => toggleValidations(index)}
-                          />
-                          <span className="validations-label">Validaciones personalizadas</span>
-                        </label>
-                      </div>
 
-                      {question.validations?.enabled && (
-                        <>
-                          <div className="validations-info">
-                            <p>Configura reglas de validación para asegurar la calidad de los datos.</p>
-                          </div>
-
-                          <div className="validation-rules">
-                            {question.validations.rules.map((rule, ruleIndex) => (
-                              <div key={ruleIndex} className="validation-rule">
-                                <div className="rule-header">
-                                  <span className="rule-label">Regla de Validación {ruleIndex + 1}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeValidationRule(index, ruleIndex)}
-                                    className="remove-rule-btn"
-                                  >
-                                    Eliminar
-                                  </button>
-                                </div>
-                                
-                                <div className="rule-content">
-                                  <div className="rule-part">
-                                    <label>Tipo de Validación:</label>
-                                    <select
-                                      className="rule-select"
-                                      value={rule.validation_type}
-                                      onChange={(e) => updateValidationRule(index, ruleIndex, 'validation_type', e.target.value)}
-                                    >
-                                      <option value="regex">Expresión Regular</option>
-                                      <option value="length">Verificación de Longitud</option>
-                                      <option value="range">Verificación de Rango</option>
-                                      <option value="email">Validación de Email</option>
-                                      <option value="url">Validación de URL</option>
-                                      <option value="phone">Número de Teléfono</option>
-                                      <option value="custom">Función Personalizada</option>
-                                    </select>
-                                  </div>
-                                  
-                                  <div className="rule-part">
-                                    <label>Regla de Validación:</label>
-                                    <input
-                                      type="text"
-                                      className="rule-input"
-                                      value={rule.validation_rule}
-                                      onChange={(e) => updateValidationRule(index, ruleIndex, 'validation_rule', e.target.value)}
-                                      placeholder="Ingresa la regla de validación..."
-                                    />
-                                  </div>
-                                  
-                                  <div className="rule-part">
-                                    <label>Mensaje de Error:</label>
-                                    <input
-                                      type="text"
-                                      className="rule-input"
-                                      value={rule.error_message}
-                                      onChange={(e) => updateValidationRule(index, ruleIndex, 'error_message', e.target.value)}
-                                      placeholder="Mensaje de error personalizado..."
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                            
-                            <button
-                              type="button"
-                              onClick={() => addValidationRule(index)}
-                              className="add-rule-btn"
-                            >
-                              + Agregar Regla de Validación
-                            </button>
-                          </div>
-
-                          <div className="validations-help">
-                            <p><strong>💡 Tipos de Validación:</strong></p>
-                            <ul>
-                              <li><strong>Regex:</strong> Patrón de expresión regular (ej: ^[A-Za-z]+$)</li>
-                              <li><strong>Longitud:</strong> Mínimo y máximo de caracteres (ej: 5,20)</li>
-                              <li><strong>Rango:</strong> Valores numéricos mínimo y máximo (ej: 18,65)</li>
-                              <li><strong>Email:</strong> Validación automática de formato de email</li>
-                              <li><strong>URL:</strong> Validación automática de formato de URL</li>
-                              <li><strong>Teléfono:</strong> Validación de números telefónicos</li>
-                              <li><strong>Personalizada:</strong> Función JavaScript personalizada</li>
-                            </ul>
-                          </div>
-                        </>
-                      )}
-                    </div>
                   </div>
                 </div>
               ))}

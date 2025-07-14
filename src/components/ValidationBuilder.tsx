@@ -94,8 +94,8 @@ const ValidationBuilder: React.FC = () => {
   const handleSaveValidation = async () => {
     try {
       const url = editingValidation 
-        ? `/api/validations/${editingValidation.id}`
-        : '/api/validations';
+        ? `http://localhost:5000/api/validations/${editingValidation.id}`
+        : 'http://localhost:5000/api/validations';
       
       const method = editingValidation ? 'PUT' : 'POST';
       
@@ -114,7 +114,7 @@ const ValidationBuilder: React.FC = () => {
         alert(editingValidation ? '¡Validación actualizada exitosamente!' : '¡Validación creada exitosamente!');
       } else {
         const error = await response.json();
-        alert(`Error: ${error.message}`);
+        alert(`Error: ${error.message || error.error}`);
       }
     } catch (error) {
       console.error('Error saving validation:', error);
@@ -128,7 +128,7 @@ const ValidationBuilder: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`/api/validations/${validationId}`, {
+      const response = await fetch(`http://localhost:5000/api/validations/${validationId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
